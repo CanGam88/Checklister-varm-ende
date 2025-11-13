@@ -1,0 +1,561 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>Checklist App</title>
+
+<!-- PWA manifest + icons -->
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#2b6ef6">
+<link rel="icon" href="icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+
+<style>
+  :root{
+    --bg:#f6f7fb;
+    --card:#fff;
+    --accent:#2b6ef6;
+    --muted:#6b7280;
+    --gap:1rem;
+    --touch-size:48px; /* ønsket min. touch-størrelse */
+  }
+
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;
+    background:var(--bg);
+    color:#111;
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+  }
+
+  header{
+    background:var(--accent);
+    color:#fff;
+    padding:1rem;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  }
+  header h1{margin:0;font-size:1.15rem}
+  main{padding:1rem;max-width:920px;margin:0 auto}
+  .grid{display:grid;gap:var(--gap)}
+  .card{background:var(--card);padding:1rem;border-radius:12px;box-shadow:0 1px 6px rgba(0,0,0,0.06)}
+  .list-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:0.9rem}
+  .list-card{padding:0.9rem;border-radius:10px;cursor:pointer;border:1px solid #eee;display:flex;flex-direction:column;justify-content:center}
+  .list-card h3{margin:.125rem 0;font-size:1rem}
+  .muted{color:var(--muted);font-size:.95rem}
+  .back-btn{background:transparent;border:0;color:#fff;font-weight:700;cursor:pointer;font-size:1rem}
+  
+  /* ITEM / CHECKBOX STYLES (store checkboxes + bedre touch) */
+  .item{
+    display:flex;
+    align-items:center;
+    gap:1rem;
+    padding:.75rem 0;
+    border-bottom:1px solid #f1f3f7;
+  }
+  /* wrapper for consistent touch size */
+  .cb-wrap{
+    width:var(--touch-size);
+    height:var(--touch-size);
+    min-width:var(--touch-size);
+    min-height:var(--touch-size);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  /* native checkbox scaled. This is simple and cross-browser acceptable */
+  .item input[type="checkbox"]{
+    /* Halveret størrelse på checkbox (tidligere scale(3) -> nu scale(1.5)) */
+.item input[type="checkbox"]{
+  width:22px;
+  height:22px; /* basisstørrelse */
+  transform:scale(1); /* ~halv størrelse af tidligere 2 */
+  transform-origin:center;
+  -webkit-transform-origin:center;
+  margin:0;
+  cursor:pointer;
+  appearance:checkbox;
+}
+
+/* Justering for meget små skærme */
+@media (max-width:420px){
+  .item input[type="checkbox"]{ transform:scale(1.8); } /* lidt større på små telefoner for touch */
+}
+  /* label styling - større tekst for læsbarhed */
+  .item .label{
+    font-size:1.05rem;
+    line-height:1.5;
+    user-select:none;
+    flex:1;
+  }
+
+  .progress{height:12px;background:#e9eefb;border-radius:10px;overflow:hidden;margin:.5rem 0}
+  .progress > i{display:block;height:100%;background:var(--accent);width:0}
+  .controls{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.5rem}
+  input[type="text"], textarea{width:100%;padding:.6rem;border:1px solid #ddd;border-radius:8px;font-size:1rem}
+  button{background:var(--accent);color:#fff;border:0;padding:.6rem .9rem;border-radius:8px;cursor:pointer;font-size:1rem}
+  .secondary{background:#eee;color:#111}
+  footer{padding:1rem;text-align:center;color:var(--muted);font-size:.9rem}
+  
+  /* Mobile-first fine tuning */
+  @media (max-width:720px){
+    main{padding:0.8rem}
+    .card{padding:0.9rem}
+    .list-card h3{font-size:1.02rem}
+    .item .label{font-size:1.06rem}
+    button{font-size:1.02rem;padding:.7rem 1rem}
+    :root{--touch-size:56px} /* endnu større touch på små skærme */
+  }
+
+  /* Small phones */
+  @media (max-width:420px){
+    header{padding:.75rem}
+    header h1{font-size:1rem}
+    .list-grid{grid-template-columns:1fr}
+    .item{gap:0.875rem;padding:.85rem 0}
+    .item .label{font-size:1.08rem}
+    :root{--touch-size:64px}
+    .item input[type="checkbox"]{transform:scale(3.1)}
+  }
+
+  /* Ensure the checkbox visually centered when scaled */
+  .item input[type="checkbox"]::-ms-check { width: 22px; height:22px; } /* IE/Edge hack */
+</style>
+</head>
+<body>
+<header>
+  <div style="display:flex;gap:.75rem;align-items:center">
+    <button class="back-btn" id="navOverview" title="Til oversigt" style="display:none">←</button>
+    <h1>Checklist App</h1>
+  </div>
+  <div>
+    <button id="openSettings" style="background:transparent;border:0;color:#fff;cursor:pointer">Indstillinger ⚙️</button>
+  </div>
+</header>
+
+<main id="app">
+  <!-- Oversigt -->
+  <section id="overview" class="grid">
+    <div class="card">
+      <h2>Vælg tjekliste</h2>
+      <p class="muted">Tryk på en tjekliste for at se og afkrydse punkter.</p>
+      <div class="list-grid" id="listsContainer" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- Detail -->
+  <section id="detail" class="grid" style="display:none">
+    <div class="card">
+      <h2 id="detailTitle">Tjekliste</h2>
+      <div id="progressWrap" class="muted" aria-hidden="true">
+        <div class="progress" aria-hidden="true"><i id="progressBar"></i></div>
+        <div class="muted" id="progressText"></div>
+      </div>
+      <div id="itemsContainer"></div>
+      <div class="controls">
+        <button id="resetList" class="secondary">Nulstil liste</button>
+        <button id="backToOverview" class="secondary">Tilbage</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Settings modal/page -->
+  <section id="settings" class="grid" style="display:none">
+    <div class="card">
+      <h2>Indstillinger</h2>
+      <label class="muted">Standard modtagere (kommasepareret e‑mailadresser)</label>
+      <input id="recipients" type="text" placeholder="fx navn@firma.dk,annet@domæne.dk" />
+      <label class="muted" style="margin-top:.5rem">Standard emne</label>
+      <input id="subject" type="text" placeholder="Tjekliste fuldført" />
+      <div style="margin-top:.5rem">
+        <label><input id="autoReset" type="checkbox" /> Nulstil liste automatisk efter email åbnes</label>
+      </div>
+      <div style="margin-top:.75rem;display:flex;gap:.5rem">
+        <button id="saveSettings">Gem</button>
+        <button id="closeSettings" class="secondary">Luk</button>
+      </div>
+      <p class="muted" style="margin-top:.5rem">Bemærk: E‑mail åbnes i brugerens e‑mail‑klient via mailto:. App'en sender ikke emails direkte.</p>
+    </div>
+  </section>
+</main>
+
+<footer>Bygget som PWA HTML demo • Redigér lister i koden (const LISTS)</footer>
+
+<script>
+/* ----- DINE 3 FASTLAGTE TJEKLISTER ----- */
+const LISTS = [
+  {
+    id: "opstart",
+    title: "Opstartsliste Kældermand Aquila L5",
+    items: [
+      "Før opstart runderes anlægget: inspicer Smeltecyklon + Cyklon 1 + Cyklon 2 for rensefolk og smede",
+      "Inspicer Oxyfuel brændere og ovnen for smelte/forbrændingsrester",
+      "Luk lågen på ovnen og bank kilerne i",
+      "Luk taphul med ler-prop og kontroller at sifonen er åben",
+      "Tappelanser er klargjort",
+      "Køling af sifon og bakker er åbnet",
+      "Ventiler for luft og Ammoniak til ammoniak-lanse er åbne",
+      "Låge til stensilo og cyklon 1+2 er lukket",
+      "Leslaw hul er rengjort",
+      "Skift kammerkølingsdyser (nye dyser ligger på filebænken i spinderværkstedet)",
+      "Spinder: kør spinder i position og lås den i gulv (se eSOP)",
+      "Monter stikkene på spinderen",
+      "Monter bindemiddel slanger på spinder",
+      "Drej ventil SK2 og SL1 på kølevands skab (køling og luft til spindere)",
+      "Kontroller at tromleblæser-lanser er rene og kørt på plads",
+      "Start procesvandspumpe (pumperum)",
+      "Rens filteret",
+      "Kontroller luft til bobbelrør på bindemiddel buffer tank er åbnet",
+      "Tjek haner under bindemiddelbuffertanken er åbne efter skylning ved nedfyring",
+      "Tjek at slange fra skyl samt hane er lukket",
+      "Tjek at dræn haner på bindemiddel streng er lukket",
+      "Dræn BM filterbeholder i BM rum og skift filtre (se evt. eSOP)",
+      "Åben bundhanen på BM filter",
+      "Start pumpen ved buffer tanken i service og kør indtil der kommer friskt grøn bindemiddel frem ved filtret",
+      "Luk bundhanen på filtret og luk den lille udluftningsventil i toppen af filtret",
+      "Bevæg halv varmt klapspjæld og kontroller at det kører frit (kan gøres når anlægget sættes i produktion)",
+      "Tjek fluidicerings-luften til halv varmt klapspjæld i penthouse og lufthamre er åben til luft på splashbox",
+      "Kontroller kammer/rensedøre på filterkanal og kammer er lukket korrekt",
+      "Åben for luft til varm splashbox ved Alu doseringsbeholder for at undgå ophobning",
+      "Smelte hjælpes ud af udløb",
+      "Efter produktionsstart: runder alle etager i ovnbygningen igen",
+      "Tjek klapspjældet arbejder rigtigt"
+    ]
+  },
+  {
+    id: "opstart2",
+    title: "Opstart / Opvarmning - Energen & Aquila",
+    items: [
+      "Drej nøgle til Energen anlægget ved kontrolrum 6 til Manuel (skal altid være manuel under drift)",
+      "Gennemgå alarmlisten",
+      "Start kølevandssystemet i Group mode Cooling billede 2201 (alle reguleringer skal være i auto)",
+      "Vent på grønt lys \"Kølesystem klar\" når opstartsekvensen kører",
+      "Åben gas og ilt haner i Aquila kølerummet til oxyfuel brænderne og ved gas rampen uden for kontrolrummet til BU 21-23",
+      "Vælg Group mode på alle sektioner på 2100 (Smeltebillede)",
+      "Vælg Start af alle sektioner undtagen uld affald i 2100",
+      "Kontroller at alle blæsere og ventiler står i Auto i 2100",
+      "Kontroller at opstartssekvensen \"Step 0\" er grøn i billede 2109; vælg 0 hvis ikke",
+      "Kontroller at sætpunktet for opvarmning før skorsten er sat til 130°C på billede 2106",
+      "Når \"Drift tilstand\" & \"Kølesystem klar\" er grøn i Cooling 2201 er anlægget klar til opstart",
+      "Nulstil spædevandstællere på kølevandsoversigt 2201",
+      "Kontroller alle flow på kølevandsbilledet 2201 (Venturi 60 m3/h, Top 15 m3/h, Ring 45 m3/h, Konus 70 m3/h, Bund 100 m3/h, Centralrør 60 m3/h)",
+      "På sekvens billede 2109: vælg \"opvarmning\" (opvarmningen starter automatisk)",
+      "Kontroller Oxyfuel status billede 3001: Mode <Brænder>, Brændere status <Off>, Mainsystem <shut off>",
+      "Billede 2104: Filter - sæt alle sektioner i Group mode og start dem",
+      "Tjek startbetingelser på sekvens billede 2109 step 5: N-gas brænder, Lufo ok (reset evt. Lufo på panelet i penthouse)",
+      "I step 30: udluft cykloner (Smeltecyklon og røggas purging kan ses på billede 2901 Aquila on gas)",
+      "Billede 133: sikre signal Digital ind og output / tjek linesafety signaler",
+      "Tjek røggas køler tryk (ca. 6,5 bar kold, 8,5-9 bar varm). Efterfyld hvis nødvendigt",
+      "Reset lav tryk pressostat og linesafety for at frigive brændere",
+      "AQ Chargering billede 2001: vælg group mode og start (Weighing: tryk start)",
+      "Ved problemer med rørbåndet: reset linesafety; sørg for fyldte sten i sten kassen",
+      "Kontroller at fines transport er startet og valgt til bigbag eller silo; spjæld korrekt",
+      "ACON billede 00500: start tromle sektion 1, start uldløfter, start tromleblæser, start forspaltevalse",
+      "Start gruppen Cooling Water på Billede 2207 (køletårn)",
+      "Tjek kammer/rensedøre på filterkanal og kammer; start kammersugerne",
+      "Start indvendig tromlerens for tjek af dyser efter skifte; lad tromlerens køre frem til opstart",
+      "Afprøv omløb og snabelbakke bevægelse; start spinder, start luftringsblæser; kontroller drift af spinder",
+      "Tjek flow til spinder køling på billede 1500: spinder (pumpen starter med spinderen)",
+      "Ved oppumpning af bindemiddel til buffertank 1274: luk første væske ud af bundventilen i buffertanken",
+      "Tjek affaldsanlæg er klar og uden alarmer på billeder 101, 102 og 103",
+      "Tjek Stor stangmølle er klar / i drift og affald kører til rørbånd",
+      "Vælg start på Filter fines dosering og Alu dosering sekvens billede 2136 NH3 (Ammoniak). Tjek grøn prik i transport luft",
+      "Når temp TT4 når 70°C tændes Oxyfuelbrænder (Bu 3.1 og 3.2 i 30 sek på billede 3001)",
+      "Step 45: ved 130°C ved skorsten er anlægget klar til drift og spjæld til skorsten åbner",
+      "Step 71: start Bu 23 på 500 kW (indvælg Bu23 på billede 2900; reset brænder og start melt-heating)",
+      "Step 72: start Bu 3.3 og Bu 3.4 på AQ Oxyfuel billede 3001 på 300 kW",
+      "Step 90: start Bu 21 + Bu 22 på 500 kW (indvælg på billede 2900; reset og start melt-heating)",
+      "Step 100: klar til produktion. Indvælg produktion på billede 2106 Generel oversigt",
+      "Smeltestart: start DrySoTec anlægget på billede 2135; tjek natriumbikarbonat i doseringsbeholder",
+      "Indvælg Raw material 6 t/h; tryk Aktuelt Setpunkt",
+      "Indvælg Bu 3.1-3.4 900 kW; indvælg Bu 21 +22 1500 kW; indvælg Bu 23 på 1800 kW (tryk aktuelt setpunkt på billede 2900)",
+      "Waste MP1 og MP2 startes på 1 t/h hver",
+      "Ved 850°C på TT9+10 frigives Bu 3.3 og returuld direkte til smeltecyklonen; indvælg returuld 0,6 ton/h",
+      "Billede 600 Bindemiddel dosering: lav en fyldning af spinderen",
+      "Tag manuel måling af smeltetemperaturen når smelten løber i udløbet; juster energien (kW) i forhold til smeltetemperaturen"
+    ]
+  },
+  {
+    id: "drift",
+    title: "Kældermand rundgang checkliste",
+    items: [
+      "Tromlerens: Kontroller at dyserne sprøjter korrekt, og at der ikke er uld ved udvendige dyser",
+      "Kontroller at reverseringen hen over tromlen kører korrekt",
+      "Kontroller spyddene til tromleafblæsere, fjern opbygninger",
+      "Er der flow nok på afblæserne, træk spyddene ud og kontroller dem",
+      "Fjern opbygninger omkring forspaltevalse, samt på skråplade",
+      "Kontroller at tromlerens pumper kører korrekt",
+      "Tør – og Vådkælder: Kontroller vandsneglen og drænristen er fri for opbygning",
+      "Kontroller at der ikke ligger åbne vandslanger, og at der ikke er vandspild nogen steder",
+      "Kontroller at niveauet i kælderbrønde er normalt, og at pumperne kører normalt",
+      "I tørkælderen kontrolleres området ved cellesluser for recycling for utætheder",
+      "Lyt efter større vibrationer end normalt, tjek for røg i hele kælderen",
+      "Pumperum: Kontroller at filtre i dagtanken ikke er stoppede, og at vi ikke bruger rå-vand i stedet for procesvand",
+      "Kontroller om pumperne kører korrekt og der ikke er utætheder",
+      "Chargeringsbygning: Tjek at skippen er fri for opbygning",
+      "Tjek at skip graven ikke er overfyldt med stenmateriale",
+      "Ved frost, tjek om der er tændt for varmen",
+      "Kontroller der ikke er opbygning i båndomkastene",
+      "Rens siderne på vejebåndet for opbygning",
+      "Kontroller at der er NaBi i bigbaggen ved Nabi doseringsanlægget og monter en ny sæk hvis den er tom",
+      "Bindemiddel bygning: Bag blandetank: Kontroller at ventil til skyl er lukket og at slangen er afmonteret",
+      "Kontroller at filtre til bindemiddel er skiftet",
+      "Affaldsanlæg: Kontroller at der ikke er bygget 'bro' op i den tørre kasseføder så tilgang til snegl er blokeret",
+      "Kontroller at følerne i kasseføderne sidder korrekt",
+      "Kontroller at transporten af affald køres igennem stangmøllen, medmindre der arbejdes med affald fra kammersuger filtre eller berokammer affald",
+      "Lyt efter uregelmæssigheder og kig efter større spild end normalt fra snegle",
+      "Hjælpematerialer på spinderdæk: Tjek hvor mange tapstænger vi har - husk at bestille ved behov",
+      "Tjek hvor mange temperaturmåler (håndgranater) vi har - husk at bestille ved behov",
+      "Buffertank og BM rum: Kontroller at luft til boblerør er åben",
+      "Kontroller at filter til bindemiddel er skiftet og udluftet",
+      "Filterdæk-Fordelerdæk-Blæserdæk: På alle dæk tjekkes for røg, støj og støv i større omfang end normalt",
+      "Tjek at alle bånd kører korrekt, så vidt muligt centreret på valserne",
+      "Kig grundigt efter evt. utætheder fra kølevands forbindelser og pumper",
+      "På blæserdækket tjekkes især efter for større vibrationsniveau end normalt",
+      "Tjek Quench bakken for opbygning",
+      "Kontroller om der er opbygning i Leslau hullet og rens hvis nødvendigt"
+    ]
+  }
+];
+
+const STORAGE_KEYS = {
+  state: "checklist_state_v1",
+  settings: "checklist_settings_v1"
+};
+
+/* Globals */
+const sendingLock = {}; // forhindrer dobbeltsend
+let state = null;
+let settings = null;
+let currentListId = null;
+
+/* Load / Save */
+function loadSettings(){
+  const raw = localStorage.getItem(STORAGE_KEYS.settings);
+  if(raw) return JSON.parse(raw);
+  // autoReset default er true som ønsket
+  return { recipients: "", subject: "Tjekliste fuldført", autoReset: true };
+}
+function saveSettings(s){ localStorage.setItem(STORAGE_KEYS.settings, JSON.stringify(s)); }
+
+function loadState(){
+  const raw = localStorage.getItem(STORAGE_KEYS.state);
+  if(raw) return JSON.parse(raw);
+  // init state for all lists
+  const s = {};
+  LISTS.forEach(l => s[l.id] = new Array(l.items.length).fill(false));
+  localStorage.setItem(STORAGE_KEYS.state, JSON.stringify(s));
+  return s;
+}
+function saveState(s){ localStorage.setItem(STORAGE_KEYS.state, JSON.stringify(s)); }
+
+/* Init */
+state = loadState();
+settings = loadSettings();
+
+/* UI helpers */
+const listsContainer = document.getElementById("listsContainer");
+const detail = document.getElementById("detail");
+const overview = document.getElementById("overview");
+const settingsSection = document.getElementById("settings");
+const navOverviewBtn = document.getElementById("navOverview");
+const openSettingsBtn = document.getElementById("openSettings");
+const backBtn = document.getElementById("backToOverview");
+const resetListBtn = document.getElementById("resetList");
+
+function renderOverview(){
+  listsContainer.innerHTML = "";
+  LISTS.forEach(list => {
+    const checkedCount = (state[list.id] || []).filter(Boolean).length;
+    const el = document.createElement("div");
+    el.className = "list-card card";
+    el.setAttribute("data-list-id", list.id);
+    el.innerHTML = `<h3>${escapeHtml(list.title)}</h3>
+      <div class="muted"><span class="count" data-count-for="${list.id}">${checkedCount}</span> / ${list.items.length} afkrydset</div>`;
+    el.addEventListener("click", () => openList(list.id));
+    listsContainer.appendChild(el);
+  });
+  showSection("overview");
+}
+
+function updateOverviewCounts(){
+  LISTS.forEach(list => {
+    const span = document.querySelector(`.count[data-count-for="${list.id}"]`);
+    if (span) {
+      const checkedCount = (state[list.id] || []).filter(Boolean).length;
+      span.textContent = checkedCount;
+    }
+  });
+}
+
+function openList(listId){
+  currentListId = listId;
+  const list = LISTS.find(l => l.id === listId);
+  document.getElementById("detailTitle").textContent = list.title;
+  renderItems(list);
+  showSection("detail");
+  navOverviewBtn.style.display = "inline-block";
+}
+
+function renderItems(list){
+  const itemsContainer = document.getElementById("itemsContainer");
+  itemsContainer.innerHTML = "";
+  const arr = state[list.id] || new Array(list.items.length).fill(false);
+  list.items.forEach((text, idx) => {
+    const row = document.createElement("div");
+    row.className = "item";
+
+    const cbWrap = document.createElement("div");
+    cbWrap.className = "cb-wrap";
+    const cb = document.createElement("input");
+    cb.type = "checkbox";
+    cb.checked = !!arr[idx];
+    cb.setAttribute("aria-label", text);
+    cb.addEventListener("change", () => {
+      arr[idx] = cb.checked;
+      state[list.id] = arr;
+      saveState(state);
+      updateProgress(list);
+      checkAllAndSend(list);
+      // opdater kun tællerne i oversigten, men bliv på detail view
+      updateOverviewCounts();
+    });
+    cbWrap.appendChild(cb);
+
+    const label = document.createElement("div");
+    label.className = "label";
+    label.innerHTML = `<strong>${escapeHtml(text)}</strong>`;
+
+    row.appendChild(cbWrap);
+    row.appendChild(label);
+    itemsContainer.appendChild(row);
+  });
+  updateProgress(list);
+}
+
+function updateProgress(list){
+  const arr = state[list.id] || [];
+  const checked = arr.filter(Boolean).length;
+  const total = list.items.length;
+  const pct = total === 0 ? 0 : Math.round((checked/total)*100);
+  document.getElementById("progressBar").style.width = pct + "%";
+  document.getElementById("progressText").textContent = `${checked} / ${total} (${pct}%)`;
+}
+
+/* Når alle er tjekket */
+function checkAllAndSend(list){
+  const arr = state[list.id] || [];
+  if (arr.length && arr.every(Boolean) && !sendingLock[list.id]) {
+    sendingLock[list.id] = true;
+    try {
+      prepareAndOpenEmail(list);
+    } finally {
+      setTimeout(() => { sendingLock[list.id] = false; }, 4000);
+    }
+  }
+}
+
+/* Byg e-mail og åbne mailklient - holder detail view åben */
+function prepareAndOpenEmail(list){
+  const s = settings;
+  const recipients = (s.recipients || "").split(",").map(r => r.trim()).filter(Boolean);
+  const subject = s.subject || `Tjekliste: ${list.title}`;
+  const bodyLines = [];
+  bodyLines.push(`Tjekliste: ${list.title}`);
+  bodyLines.push("");
+  list.items.forEach((t, idx) => {
+    const ok = (state[list.id] && state[list.id][idx]) ? "✓" : "✗";
+    bodyLines.push(`${ok} ${t}`);
+  });
+  bodyLines.push("");
+  bodyLines.push("Fuldført: " + new Date().toLocaleString());
+  const body = bodyLines.join("\n");
+
+  const recipientsPart = recipients.length ? recipients.join(",") : "";
+  const mailtoBase = recipientsPart ? `mailto:${recipientsPart}` : "mailto:";
+  const query = `?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  const target = mailtoBase + query;
+
+  // Programmatisk <a> klik (kompatibelt med mange browsere)
+  const a = document.createElement("a");
+  a.href = target;
+  a.style.display = "none";
+  a.target = "_blank";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+
+  // auto reset hvis valgt — opdater detail view (holdes åben)
+  if (settings.autoReset) {
+    state[list.id] = new Array(list.items.length).fill(false);
+    saveState(state);
+    setTimeout(() => {
+      if (currentListId === list.id) renderItems(list);
+      updateOverviewCounts();
+    }, 500);
+  }
+}
+
+/* Settings UI */
+document.getElementById("recipients").value = settings.recipients || "";
+document.getElementById("subject").value = settings.subject || "";
+document.getElementById("autoReset").checked = !!settings.autoReset;
+
+document.getElementById("saveSettings").addEventListener("click", () => {
+  const recipients = document.getElementById("recipients").value;
+  const subject = document.getElementById("subject").value || "Tjekliste fuldført";
+  const autoReset = document.getElementById("autoReset").checked;
+  settings = { recipients, subject, autoReset };
+  saveSettings(settings);
+  alert("Indstillinger gemt");
+});
+
+openSettingsBtn.addEventListener("click", () => {
+  document.getElementById("recipients").value = settings.recipients || "";
+  document.getElementById("subject").value = settings.subject || "";
+  document.getElementById("autoReset").checked = !!settings.autoReset;
+  showSection("settings");
+});
+document.getElementById("closeSettings").addEventListener("click", () => showSection("overview"));
+
+document.getElementById("backToOverview").addEventListener("click", () => showSection("overview"));
+navOverviewBtn.addEventListener("click", () => showSection("overview"));
+resetListBtn.addEventListener("click", () => {
+  if(!currentListId) return;
+  if(!confirm("Vil du nulstille alle afkrydsninger i denne liste?")) return;
+  state[currentListId] = new Array(LISTS.find(l=>l.id===currentListId).items.length).fill(false);
+  saveState(state);
+  renderItems(LISTS.find(l=>l.id===currentListId));
+  renderOverview();
+});
+
+function showSection(name){
+  overview.style.display = name === "overview" ? "" : "none";
+  detail.style.display = name === "detail" ? "" : "none";
+  settingsSection.style.display = name === "settings" ? "" : "none";
+  const showBack = name === "detail";
+  navOverviewBtn.style.display = showBack ? "inline-block" : "none";
+}
+
+function escapeHtml(str){ return String(str).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+
+/* Start */
+renderOverview();
+
+/* Service worker registration (PWA) */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/service-worker.js')
+      .then(reg => console.log('Service Worker registreret:', reg.scope))
+      .catch(err => console.warn('SW registrering fejlede:', err));
+  });
+}
+</script>
+</body>
+</html>
