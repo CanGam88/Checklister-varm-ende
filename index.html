@@ -19,7 +19,6 @@
     --accent:#2b6ef6;
     --muted:#6b7280;
     --gap:1rem;
-    --touch-size:48px; /* ønsket min. touch-størrelse */
   }
 
   html,body{height:100%}
@@ -51,7 +50,7 @@
   .muted{color:var(--muted);font-size:.95rem}
   .back-btn{background:transparent;border:0;color:#fff;font-weight:700;cursor:pointer;font-size:1rem}
   
-  /* ITEM / CHECKBOX STYLES (store checkboxes + bedre touch) */
+  /* ITEM / CHECKBOX STYLES (større checkboxes + større tekst) */
   .item{
     display:flex;
     align-items:center;
@@ -59,38 +58,34 @@
     padding:.75rem 0;
     border-bottom:1px solid #f1f3f7;
   }
-  /* wrapper for consistent touch size */
+
+  /* wrapper for touch target */
   .cb-wrap{
-    width:var(--touch-size);
-    height:var(--touch-size);
-    min-width:var(--touch-size);
-    min-height:var(--touch-size);
+    width:64px;
+    height:64px;
+    min-width:64px;
+    min-height:64px;
     display:flex;
     align-items:center;
     justify-content:center;
   }
-  /* native checkbox scaled. This is simple and cross-browser acceptable */
-  .item input[type="checkbox"]{
-    /* Halveret størrelse på checkbox (tidligere scale(3) -> nu scale(1.5)) */
-.item input[type="checkbox"]{
-  width:22px;
-  height:22px; /* basisstørrelse */
-  transform:scale(1); /* ~halv størrelse af tidligere 2 */
-  transform-origin:center;
-  -webkit-transform-origin:center;
-  margin:0;
-  cursor:pointer;
-  appearance:checkbox;
-}
 
-/* Justering for meget små skærme */
-@media (max-width:420px){
-  .item input[type="checkbox"]{ transform:scale(1.8); } /* lidt større på små telefoner for touch */
-}
-  /* label styling - større tekst for læsbarhed */
+  /* Checkbox: ca. 2x større end normal */
+  .item input[type="checkbox"]{
+    width:22px;
+    height:22px;
+    transform:scale(2);
+    transform-origin:center;
+    -webkit-transform-origin:center;
+    margin:0;
+    cursor:pointer;
+    appearance:checkbox;
+  }
+
+  /* Label: 50% større tekst (fra ~1.05rem -> ~1.575rem) */
   .item .label{
-    font-size:1.05rem;
-    line-height:1.5;
+    font-size:1.575rem;
+    line-height:1.3;
     user-select:none;
     flex:1;
   }
@@ -108,24 +103,22 @@
     main{padding:0.8rem}
     .card{padding:0.9rem}
     .list-card h3{font-size:1.02rem}
-    .item .label{font-size:1.06rem}
-    button{font-size:1.02rem;padding:.7rem 1rem}
-    :root{--touch-size:56px} /* endnu større touch på små skærme */
+    .item .label{ font-size:1.65rem; }
+    .cb-wrap{ width:72px; height:72px; min-width:72px; min-height:72px; }
   }
 
-  /* Small phones */
   @media (max-width:420px){
     header{padding:.75rem}
     header h1{font-size:1rem}
     .list-grid{grid-template-columns:1fr}
     .item{gap:0.875rem;padding:.85rem 0}
-    .item .label{font-size:1.08rem}
-    :root{--touch-size:64px}
-    .item input[type="checkbox"]{transform:scale(3.1)}
+    .item .label{ font-size:1.7rem }
+    .cb-wrap{ width:76px; height:76px; min-width:76px; min-height:76px; }
+    .item input[type="checkbox"]{ transform:scale(2.05); }
   }
 
-  /* Ensure the checkbox visually centered when scaled */
-  .item input[type="checkbox"]::-ms-check { width: 22px; height:22px; } /* IE/Edge hack */
+  /* IE/Edge hack for scaled checkbox */
+  .item input[type="checkbox"]::-ms-check { width: 22px; height:22px; }
 </style>
 </head>
 <body>
@@ -339,7 +332,6 @@ let currentListId = null;
 function loadSettings(){
   const raw = localStorage.getItem(STORAGE_KEYS.settings);
   if(raw) return JSON.parse(raw);
-  // autoReset default er true som ønsket
   return { recipients: "", subject: "Tjekliste fuldført", autoReset: true };
 }
 function saveSettings(s){ localStorage.setItem(STORAGE_KEYS.settings, JSON.stringify(s)); }
@@ -347,7 +339,6 @@ function saveSettings(s){ localStorage.setItem(STORAGE_KEYS.settings, JSON.strin
 function loadState(){
   const raw = localStorage.getItem(STORAGE_KEYS.state);
   if(raw) return JSON.parse(raw);
-  // init state for all lists
   const s = {};
   LISTS.forEach(l => s[l.id] = new Array(l.items.length).fill(false));
   localStorage.setItem(STORAGE_KEYS.state, JSON.stringify(s));
@@ -423,7 +414,6 @@ function renderItems(list){
       saveState(state);
       updateProgress(list);
       checkAllAndSend(list);
-      // opdater kun tællerne i oversigten, men bliv på detail view
       updateOverviewCounts();
     });
     cbWrap.appendChild(cb);
@@ -461,7 +451,7 @@ function checkAllAndSend(list){
   }
 }
 
-/* Byg e-mail og åbne mailklient - holder detail view åben */
+/* Byg e-mail og åbn mailklient - holder detail view åben */
 function prepareAndOpenEmail(list){
   const s = settings;
   const recipients = (s.recipients || "").split(",").map(r => r.trim()).filter(Boolean);
@@ -482,7 +472,7 @@ function prepareAndOpenEmail(list){
   const query = `?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   const target = mailtoBase + query;
 
-  // Programmatisk <a> klik (kompatibelt med mange browsere)
+  // Programmatisk <a> klik
   const a = document.createElement("a");
   a.href = target;
   a.style.display = "none";
