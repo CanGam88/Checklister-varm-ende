@@ -70,7 +70,7 @@
     justify-content:center;
   }
 
-  /* Checkbox: ca. 2x større end normal */
+  /* Checkbox: ca. 2x større than default */
   .item input[type="checkbox"]{
     width:22px;
     height:22px;
@@ -82,7 +82,7 @@
     appearance:checkbox;
   }
 
-  /* Label: 50% større tekst (fra ~1.05rem -> ~1.575rem) */
+  /* Label: 50% større tekst */
   .item .label{
     font-size:1.575rem;
     line-height:1.3;
@@ -97,7 +97,25 @@
   button{background:var(--accent);color:#fff;border:0;padding:.6rem .9rem;border-radius:8px;cursor:pointer;font-size:1rem}
   .secondary{background:#eee;color:#111}
   footer{padding:1rem;text-align:center;color:var(--muted);font-size:.9rem}
-  
+
+  /* Toast / Snackbar */
+  .toast {
+    position: fixed;
+    left: 50%;
+    bottom: 28px;
+    transform: translateX(-50%) translateY(10px);
+    background: rgba(0,0,0,0.88);
+    color: #fff;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    z-index: 9999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 220ms ease, transform 220ms ease;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; }
+
   /* Mobile-first fine tuning */
   @media (max-width:720px){
     main{padding:0.8rem}
@@ -162,10 +180,12 @@
   <section id="settings" class="grid" style="display:none">
     <div class="card">
       <h2>Indstillinger</h2>
-      <label class="muted">Standard modtagere (kommasepareret e‑mailadresser)</label>
-      <input id="recipients" type="text" placeholder="fx navn@firma.dk,annet@domæne.dk" />
-      <label class="muted" style="margin-top:.5rem">Standard emne</label>
-      <input id="subject" type="text" placeholder="Tjekliste fuldført" />
+      <label class="muted">Modtager(e) (fikseret)</label>
+      <input id="recipients" type="text" readonly />
+      <div style="margin-top:.5rem">
+        <label class="muted">Standard emne</label>
+        <input id="subject" type="text" placeholder="Tjekliste fuldført" />
+      </div>
       <div style="margin-top:.5rem">
         <label><input id="autoReset" type="checkbox" /> Nulstil liste automatisk efter email åbnes</label>
       </div>
@@ -173,14 +193,19 @@
         <button id="saveSettings">Gem</button>
         <button id="closeSettings" class="secondary">Luk</button>
       </div>
-      <p class="muted" style="margin-top:.5rem">Bemærk: E‑mail åbnes i brugerens e‑mail‑klient via mailto:. App'en sender ikke emails direkte.</p>
+      <p class="muted" style="margin-top:.5rem">Bemærk: Modtagerne er faste og kan ikke ændres i denne version. E‑mail åbnes i brugerens e‑mail‑klient via mailto:.</p>
     </div>
   </section>
 </main>
 
 <footer>Bygget som PWA HTML demo • Redigér lister i koden (const LISTS)</footer>
 
+<div class="toast" aria-live="polite" aria-atomic="true" id="globalToast" style="display:none"></div>
+
 <script>
+/* ----- KONSTANTER: FASTE MODTAGERE ----- */
+const FIXED_RECIPIENTS = ['lasse.gamborg@hotmail.com', 'lasse.gamborg@rockwool.com'];
+
 /* ----- DINE 3 FASTLAGTE TJEKLISTER ----- */
 const LISTS = [
   {
@@ -332,7 +357,7 @@ let currentListId = null;
 function loadSettings(){
   const raw = localStorage.getItem(STORAGE_KEYS.settings);
   if(raw) return JSON.parse(raw);
-  return { recipients: "", subject: "Tjekliste fuldført", autoReset: true };
+  return { recipients: FIXED_RECIPIENTS.join(','), subject: "Tjekliste fuldført", autoReset: true };
 }
 function saveSettings(s){ localStorage.setItem(STORAGE_KEYS.settings, JSON.stringify(s)); }
 
@@ -359,6 +384,26 @@ const navOverviewBtn = document.getElementById("navOverview");
 const openSettingsBtn = document.getElementById("openSettings");
 const backBtn = document.getElementById("backToOverview");
 const resetListBtn = document.getElementById("resetList");
+const recipientsInput = document.getElementById("recipients");
+const subjectInput = document.getElementById("subject");
+const autoResetInput = document.getElementById("autoReset");
+const toastEl = document.getElementById("globalToast");
+
+/* Set readonly recipients field to fixed recipients */
+if (recipientsInput) recipientsInput.value = FIXED_RECIPIENTS.join(', ');
+
+/* Toast helper */
+function showToast(text, ms = 3000){
+  if(!toastEl) return;
+  toastEl.style.display = 'block';
+  toastEl.textContent = text;
+  toastEl.classList.add('show');
+  clearTimeout(toastEl._timeout);
+  toastEl._timeout = setTimeout(() => {
+    toastEl.classList.remove('show');
+    setTimeout(() => { toastEl.style.display = 'none'; }, 220);
+  }, ms);
+}
 
 function renderOverview(){
   listsContainer.innerHTML = "";
@@ -451,11 +496,10 @@ function checkAllAndSend(list){
   }
 }
 
-/* Byg e-mail og åbn mailklient - holder detail view åben */
+/* Byg e-mail og åbn mailklient - bruger FIXED_RECIPIENTS og viser toast */
 function prepareAndOpenEmail(list){
-  const s = settings;
-  const recipients = (s.recipients || "").split(",").map(r => r.trim()).filter(Boolean);
-  const subject = s.subject || `Tjekliste: ${list.title}`;
+  const recipients = FIXED_RECIPIENTS.slice();
+  const subject = settings.subject || `Tjekliste: ${list.title}`;
   const bodyLines = [];
   bodyLines.push(`Tjekliste: ${list.title}`);
   bodyLines.push("");
@@ -481,6 +525,9 @@ function prepareAndOpenEmail(list){
   a.click();
   document.body.removeChild(a);
 
+  // Vis bekræftelse til afsender
+  showToast("Sendt til liniemester", 3500);
+
   // auto reset hvis valgt — opdater detail view (holdes åben)
   if (settings.autoReset) {
     state[list.id] = new Array(list.items.length).fill(false);
@@ -493,23 +540,23 @@ function prepareAndOpenEmail(list){
 }
 
 /* Settings UI */
-document.getElementById("recipients").value = settings.recipients || "";
-document.getElementById("subject").value = settings.subject || "";
-document.getElementById("autoReset").checked = !!settings.autoReset;
+if (recipientsInput) recipientsInput.value = FIXED_RECIPIENTS.join(', ');
+if (subjectInput) subjectInput.value = settings.subject || '';
+if (autoResetInput) autoResetInput.checked = !!settings.autoReset;
 
 document.getElementById("saveSettings").addEventListener("click", () => {
-  const recipients = document.getElementById("recipients").value;
+  // recipients er read-only / faste - vi gemmer kun subject + autoReset
   const subject = document.getElementById("subject").value || "Tjekliste fuldført";
   const autoReset = document.getElementById("autoReset").checked;
-  settings = { recipients, subject, autoReset };
+  settings = { recipients: FIXED_RECIPIENTS.join(','), subject, autoReset };
   saveSettings(settings);
-  alert("Indstillinger gemt");
+  showToast("Indstillinger gemt", 1400);
 });
 
 openSettingsBtn.addEventListener("click", () => {
-  document.getElementById("recipients").value = settings.recipients || "";
-  document.getElementById("subject").value = settings.subject || "";
-  document.getElementById("autoReset").checked = !!settings.autoReset;
+  if (recipientsInput) recipientsInput.value = FIXED_RECIPIENTS.join(', ');
+  if (subjectInput) subjectInput.value = settings.subject || '';
+  if (autoResetInput) autoResetInput.checked = !!settings.autoReset;
   showSection("settings");
 });
 document.getElementById("closeSettings").addEventListener("click", () => showSection("overview"));
