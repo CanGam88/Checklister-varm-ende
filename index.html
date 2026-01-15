@@ -3,34 +3,32 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Checklister Varm ende — Trimmed MVP</title>
+  <title>Checklister Varm ende — ROCKWOOL</title>
   <style>
     :root{
       --rock-red:#E60028;
-      --green:#28a745;
-      --bg:#f5f5f5;
-      --card:#fff;
-      --text:#111;
-      --muted:#666;
+      --bg:#f3f4f6;
+      --card:#ffffff;
+      --text:#111111;
+      --muted:#6b7280;
       --heading-bg:#E8EAF6;
       --heading-color:#1A237E;
       --note-bg:#FFFDE7;
       --note-color:#757575;
     }
 
-    /* Dark mode tema */
     body.dark{
-      --bg:#111827;
+      --bg:#0f172a;
       --card:#1f2933;
       --text:#f9fafb;
       --muted:#9ca3af;
-      --heading-bg:#111827;
+      --heading-bg:#0f172a;
       --heading-color:#e5e7eb;
       --note-bg:#111827;
       --note-color:#d1d5db;
     }
     body.dark header{
-      background:#000;
+      background:#b3001f;
     }
     body.dark .card{
       box-shadow:0 1px 4px rgba(0,0,0,.7);
@@ -49,27 +47,40 @@
       background:#111827;
     }
     body.dark #progressWrapper{
-      background:rgba(17,24,39,0.96);
+      background:rgba(15,23,42,0.96);
       border-bottom:1px solid #374151;
     }
     body.dark .progress-text{
       color:#e5e7eb;
     }
     body.dark .modal-card{
-      background:#111827;
-      color:#f9fafb;
+      background:var(--card);
+      color:var(--text);
     }
     body.dark .modal{
       background:rgba(0,0,0,0.8);
     }
 
-    *{box-sizing:border-box}
     html,body{
-      height:100%;
       margin:0;
       font-family:system-ui,Roboto,Arial;
-      background:var(--bg);
+      background-color:var(--bg);
       color:var(--text);
+    }
+    body{
+      min-height:100vh;
+    }
+    body.dark html,
+    body.dark{
+      background-color:var(--bg) !important;
+      color:var(--text) !important;
+    }
+
+    main{
+      max-width:900px;
+      margin:12px auto;
+      padding:18px;
+      background-color:var(--bg);
     }
 
     header{
@@ -93,24 +104,29 @@
       padding:4px 12px 6px;
       z-index:1200;
       background:rgba(255,255,255,0.95);
-      border-bottom:1px solid #eee;
+      border-bottom:1px solid #e5e7eb;
       flex-direction:column;
       gap:4px;
     }
+
     .progress-track{
       width:70%;
       max-width:700px;
       height:12px;
-      background:#eee;
+      background:#e5e7eb;
       border-radius:10px;
       overflow:hidden;
       position:relative;
     }
+    body.dark .progress-track{
+      background:#111827;
+    }
+
     .progress-fill{
       height:100%;
       width:0;
       background:var(--rock-red);
-      transition:width .3s ease,background-color .3s ease;
+      transition:width .3s ease;
     }
     .progress-row{
       display:flex;
@@ -122,8 +138,11 @@
     .progress-text{
       font-weight:600;
       font-size:11px;
-      color:#333;
+      color:#374151;
       white-space:nowrap;
+    }
+    body.dark .progress-text{
+      color:#e5e7eb;
     }
     #progressHint{
       font-size:11px;
@@ -133,18 +152,34 @@
       color:#d1d5db;
     }
 
-    main{max-width:900px;margin:12px auto;padding:18px}
-    .card{background:var(--card);border-radius:8px;padding:12px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+    .card{
+      background-color:var(--card);
+      border-radius:8px;
+      padding:12px;
+      margin-bottom:12px;
+      box-shadow:0 1px 4px rgba(0,0,0,.06);
+    }
+
     label{font-weight:700}
     input,select,textarea{
       width:100%;
       padding:10px;
-      border:1px solid #ddd;
+      border:1px solid #d4d4d4;
       border-radius:8px;
       margin-top:8px;
       font:inherit;
+      background-color:#ffffff;
+      color:#111827;
     }
     textarea{min-height:100px}
+    body.dark input,
+    body.dark select,
+    body.dark textarea{
+      background-color:#111827;
+      border-color:#374151;
+      color:#f9fafb;
+    }
+
     .row{display:flex;gap:10px;flex-wrap:wrap}
     .col{flex:1;min-width:160px}
 
@@ -170,6 +205,17 @@
       color:var(--rock-red);
       border:1px solid var(--rock-red);
     }
+    body.dark button{
+      background:#b3001f;
+      color:#f9fafb;
+      border-color:#b3001f;
+    }
+    body.dark button.ghost{
+      background:transparent;
+      color:#fca5a5;
+      border-color:#fca5a5;
+    }
+
     .small{font-size:13px;color:var(--muted)}
 
     .list-items{margin-top:12px}
@@ -178,25 +224,65 @@
       gap:10px;
       align-items:flex-start;
       padding:10px 8px;
-      border-bottom:1px solid #f0f0f0;
+      border-bottom:1px solid #e5e7eb;
+    }
+    body.dark .item{
+      border-bottom:1px solid #374151;
     }
     .item label{
       flex:1;
       line-height:1.4;
       padding-top:1px;
+      transition:color .2s ease, opacity .2s ease, text-decoration-color .2s ease;
     }
-    input[type="checkbox"]{
-      width:22px;
-      height:22px;
-      transform:scale(1.1);
-      flex-shrink:0;
+
+    .item.task input[type="checkbox"]{
+      width:20px;
+      height:20px;
       margin-top:2px;
+      flex-shrink:0;
+      border-radius:4px;
+      border:2px solid #cbd5e1;
+      appearance:none;
+      -webkit-appearance:none;
+      background:#fff;
+      position:relative;
+      cursor:pointer;
+      outline:none;
+      transition:border-color .2s ease, background .2s ease, transform .15s ease;
     }
+    body.dark .item.task input[type="checkbox"]{
+      background:#111827;
+      border-color:#4b5563;
+    }
+    .item.task input[type="checkbox"]::before{
+      content:'';
+      position:absolute;
+      left:4px;
+      top:3px;
+      width:8px;
+      height:12px;
+      border-right:2px solid #fff;
+      border-bottom:2px solid #fff;
+      transform:rotate(35deg) scale(0);
+      transform-origin:bottom left;
+      transition:transform .2s ease-out;
+    }
+    .item.task input[type="checkbox"]:checked{
+      background:var(--rock-red);
+      border-color:var(--rock-red);
+      transform:scale(1.05);
+    }
+    .item.task input[type="checkbox"]:checked::before{
+      transform:rotate(35deg) scale(1);
+    }
+
     .done{
-      opacity:.55;
-      color:var(--muted);
+      opacity:.9;
+      color:var(--rock-red);
+      text-decoration:line-through;
+      text-decoration-color:var(--rock-red);
     }
-    .item.task.done label{text-decoration:line-through;}
 
     .item.heading{
       background:var(--heading-bg);
@@ -211,7 +297,6 @@
       color:var(--heading-color);
       font-size:1.05em;
     }
-    .item.heading input[type="checkbox"]{display:none;}
 
     .item.note{
       background:var(--note-bg);
@@ -226,14 +311,20 @@
       color:var(--note-color);
       font-size:0.95em;
     }
-    .item.note input[type="checkbox"]{display:none;}
 
     .list-items .item:last-child{border-bottom:none}
-    .list-items .item.task + .item.heading,
-    .list-items .item.task + .item.note{border-bottom:none}
 
-    details#completedSection{margin-top:12px;border-top:1px dashed #eee;padding-top:8px}
-    details#completedSection summary{font-weight:700;cursor:pointer;padding:8px 6px}
+    details#completedSection{
+      margin-top:12px;
+      border-top:1px dashed #e5e7eb;
+      padding-top:8px;
+    }
+    details#completedSection summary{
+      font-weight:700;
+      cursor:pointer;
+      padding:8px 6px;
+    }
+
     .helper{font-size:13px;color:#b12727;margin-top:6px}
     footer{color:var(--muted);text-align:center;margin:20px 0}
     .btn-small{padding:5px 8px;font-size:12px;border-radius:6px}
@@ -265,6 +356,9 @@
       font-weight:600;
       cursor:pointer;
       padding:5px;
+    }
+    body.dark .modal .close-btn{
+      color:#fca5a5;
     }
     .modal-actions{
       margin-top:10px;
@@ -300,9 +394,8 @@
           <div class="small">Vælg liste, udfyld arbejdsnummer og dato.</div>
         </div>
         <div style="display:flex;gap:8px;align-items:center">
-          <!-- Dark mode ikon-knap -->
-          <button id="btnToggleTheme" class="ghost" style="width:44px;padding:8px 0;font-size:18px">🌙</button>
-          <button id="btnOpenSettings" class="ghost">Indstillinger</button>
+          <!-- Kun tandhjul på forsiden -->
+          <button id="btnOpenSettings" class="ghost" title="Indstillinger">⚙️</button>
         </div>
       </div>
 
@@ -342,7 +435,7 @@
       <div id="itemsContainer" class="list-items"></div>
 
       <details id="completedSection" style="display:none">
-        <summary id="completedSummary">Udførte opgaver (0)</summary>
+        <summary id="completedSummary" title="Se udførte opgaver">Udførte opgaver (0)</summary>
         <div id="completedContainer" class="list-items"></div>
       </details>
 
@@ -359,16 +452,28 @@
       <div class="meta small" style="margin-top:8px">Tryk Send når alle punkter er afkrydset for at sende checklisten.</div>
     </section>
 
-    <!-- Indstillinger-modal (inline display styring) -->
     <div id="modalSettings" class="modal" style="display:none" aria-hidden="true">
       <div class="modal-card">
         <div style="display:flex;justify-content:space-between;align-items:center">
-          <div><strong>Indstillinger</strong><div class="small">Indtast to modtager-e-mails.</div></div>
+          <div>
+            <strong>Indstillinger</strong>
+            <div class="small">Tema og modtager-e-mails.</div>
+          </div>
           <div><button id="btnCloseSettings" class="close-btn">Luk</button></div>
         </div>
         <div style="margin-top:10px">
-          <label>Modtager 1</label><input id="rec1" type="email" placeholder="modtager1@firma.dk"/>
-          <label style="margin-top:8px">Modtager 2</label><input id="rec2" type="email" placeholder="modtager2@firma.dk"/>
+          <label for="themeSelect">Tema</label>
+          <select id="themeSelect">
+            <option value="light">Lys tilstand</option>
+            <option value="dark">Mørk tilstand</option>
+          </select>
+
+          <label style="margin-top:12px">Modtager 1</label>
+          <input id="rec1" type="email" placeholder="modtager1@firma.dk"/>
+
+          <label style="margin-top:8px">Modtager 2</label>
+          <input id="rec2" type="email" placeholder="modtager2@firma.dk"/>
+
           <div class="modal-actions">
             <button id="btnCloseAlt" class="ghost">Luk</button>
           </div>
@@ -381,14 +486,18 @@
   <footer class="small">Enkel offline HTML‑app</footer>
 
   <script>
-    const LS_REC1='rg_rec1', LS_REC2='rg_rec2';
-    const THEME_KEY='checklister_theme';
+    const STORAGE_KEYS = {
+      recipient1: 'rg_rec1',
+      recipient2: 'rg_rec2',
+      theme:      'checklister_theme'
+    };
 
     const headerEl=document.getElementById('mainHeader')||document.querySelector('header');
     const progressWrapper=document.getElementById('progressWrapper');
     const progressFill=document.getElementById('progressFill');
     const progressText=document.getElementById('progressText');
     const progressHint=document.getElementById('progressHint');
+    const progressTrack=document.querySelector('.progress-track');
 
     const pageHome=document.getElementById('page-home');
     const pageChecklist=document.getElementById('page-checklist');
@@ -415,15 +524,11 @@
     const btnCloseAlt=document.getElementById('btnCloseAlt');
     const rec1=document.getElementById('rec1');
     const rec2=document.getElementById('rec2');
-
-    const btnToggleTheme=document.getElementById('btnToggleTheme');
+    const themeSelect=document.getElementById('themeSelect');
 
     const headingWhitelist = [
-      "Indledende.",
       "Smeltestart",
-      "Før opstart runderes anlægget  :",
-      "Kontroller at:",
-      "Ansvarlig Liniemester."
+      "Før opstart runderes anlægget  :"
     ];
 
     const checklists = {
@@ -507,7 +612,7 @@
         "Monter blæserør på spinderen.",
         "Kør spinder i position og lås den i gulv.",
         "Monter stikkene på spinderen.",
-        "Monter multi stik på spinder.",
+        "Monter multi stik på spinderen.",
         "Drej ventil SK2 Kølekappe ved klaver åbnes",
         "Kontroller at tromleblæser-lanser er rene og kørt på plads.",
         "Start procesvandspumpe (pumperum). Rens filteret",
@@ -548,6 +653,15 @@
     let currentChecklistName=null;
     let checkedMap={};
 
+    function show(el, display='block'){
+      if (!el) return;
+      el.style.display = display;
+    }
+    function hide(el){
+      if (!el) return;
+      el.style.display = 'none';
+    }
+
     function adjustProgressTop(){
       progressWrapper.style.top=(headerEl.offsetHeight)+'px';
     }
@@ -586,22 +700,23 @@
 
     function updateProgressBar(){
       if(pageChecklist.style.display==='none' || !currentChecklistName){
-        progressWrapper.style.display='none';
+        hide(progressWrapper);
         return;
       }
       const { totalTasks, checkedTasks } = getTaskCountsFromDom();
       if(!totalTasks){
-        progressWrapper.style.display='none';
+        hide(progressWrapper);
         progressText.textContent='0% · 0/0';
         progressFill.style.width='0%';
-        progressHint.style.display='none';
+        hide(progressHint);
+        if(progressTrack) progressTrack.setAttribute('aria-valuenow','0');
         return;
       }
       const pct=Math.round((checkedTasks/totalTasks)*100);
       const remaining = totalTasks - checkedTasks;
 
       progressFill.style.width=pct+'%';
-      progressFill.style.backgroundColor=pct>=100?'var(--green)':'var(--rock-red)';
+      progressFill.style.backgroundColor=getComputedStyle(document.documentElement).getPropertyValue('--rock-red') || '#E60028';
       progressText.textContent=`${pct}% · ${checkedTasks}/${totalTasks}`;
 
       if(remaining > 0){
@@ -609,11 +724,10 @@
       } else {
         progressHint.textContent = 'Alle opgaver er udført – klar til at sende';
       }
-      progressHint.style.display='block';
+      show(progressHint);
 
-      const track = progressWrapper.querySelector('.progress-track');
-      if (track) track.setAttribute('aria-valuenow', String(pct));
-      progressWrapper.style.display='flex';
+      if (progressTrack) progressTrack.setAttribute('aria-valuenow', String(pct));
+      show(progressWrapper,'flex');
       checkAllAndShowSend();
     }
 
@@ -621,6 +735,33 @@
       if(pageChecklist.style.display==='none') return;
       const { totalTasks, checkedTasks } = getTaskCountsFromDom();
       btnSend.style.display=(checkedTasks===totalTasks && totalTasks>0)?'block':'none';
+    }
+
+    function attachCheckboxLogic(cb, div){
+      cb.addEventListener('change', e=>{
+        const idx=parseInt(div.dataset.taskIndex,10);
+        const checked = !!e.target.checked;
+        checkedMap[idx]=checked;
+
+        if(checked){
+          div.classList.add('done');
+          setTimeout(() => {
+            completedContainer.appendChild(div);
+            show(completedSection);
+            completedSummary.textContent='Udførte opgaver ('+completedContainer.children.length+')';
+          }, 250);
+        } else {
+          div.classList.remove('done');
+          insertInOrder(div, itemsContainer, parseInt(div.dataset.originalIndex,10));
+          if(completedContainer.children.length===0){
+            hide(completedSection);
+            completedSummary.textContent='Udførte opgaver (0)';
+          } else {
+            completedSummary.textContent='Udførte opgaver ('+completedContainer.children.length+')';
+          }
+        }
+        updateProgressBar();
+      });
     }
 
     function renderChecklist(name){
@@ -631,8 +772,9 @@
       chkMeta.textContent=`Arbejdsnummer: ${homeWorkNr.value||''} · Dato: ${homeDate.value||''}`;
       itemsContainer.innerHTML='';
       completedContainer.innerHTML='';
-      completedSection.style.display='none';
-      btnSend.style.display='none';
+      hide(completedSection);
+      completedSummary.textContent='Udførte opgaver (0)';
+      hide(btnSend);
 
       const items=checklists[name]||[];
       let taskIndex=0;
@@ -641,58 +783,62 @@
         const div=document.createElement('div');
         const originalText=t.trim();
         let displayText=originalText;
-        let is_task=isTask(originalText);
-
-        if(is_task){
-          div.className='item task';
-          div.dataset.taskIndex=taskIndex;
-          taskIndex++;
-        } else if(isNote(originalText)){
-          div.className='item note';
-        } else if(isHeading(originalText)){
-          div.className='item heading';
-          if(displayText.endsWith('.')) displayText=displayText.slice(0,-1);
-        } else {
-          div.className='item task';
-          div.dataset.taskIndex=taskIndex;
-          is_task=true;
-          taskIndex++;
-        }
+        const is_task=isTask(originalText);
 
         div.dataset.originalIndex=i;
-        const lbl=document.createElement('label');
-        lbl.textContent=displayText;
 
         if(is_task){
+          div.className='item task';
+          div.dataset.taskIndex=taskIndex;
+          taskIndex++;
+
           const cb=document.createElement('input');
           cb.type='checkbox';
           cb.id='cb_'+div.dataset.taskIndex;
+
+          const lbl=document.createElement('label');
           lbl.htmlFor=cb.id;
-
-          cb.addEventListener('change', e=>{
-            const idx=parseInt(div.dataset.taskIndex,10);
-            checkedMap[idx]=!!e.target.checked;
-
-            if(e.target.checked){
-              div.classList.add('done');
-              completedContainer.appendChild(div);
-              completedSection.style.display='block';
-            } else {
-              div.classList.remove('done');
-              insertInOrder(div,itemsContainer,parseInt(div.dataset.originalIndex,10));
-              if(completedContainer.children.length===0){
-                completedSection.style.display='none';
-              }
-            }
-            completedSummary.textContent='Udførte opgaver ('+completedContainer.children.length+')';
-            updateProgressBar();
-          });
+          lbl.textContent=displayText;
 
           div.appendChild(cb);
-        }
+          div.appendChild(lbl);
 
-        div.appendChild(lbl);
-        itemsContainer.appendChild(div);
+          attachCheckboxLogic(cb, div);
+
+          itemsContainer.appendChild(div);
+        } else if(isNote(originalText)){
+          div.className='item note';
+          const lbl=document.createElement('label');
+          lbl.textContent=displayText;
+          div.appendChild(lbl);
+          itemsContainer.appendChild(div);
+        } else if(isHeading(originalText)){
+          div.className='item heading';
+          if(displayText.endsWith('.')) displayText=displayText.slice(0,-1);
+          const lbl=document.createElement('label');
+          lbl.textContent=displayText;
+          div.appendChild(lbl);
+          itemsContainer.appendChild(div);
+        } else {
+          div.className='item task';
+          div.dataset.taskIndex=taskIndex;
+          taskIndex++;
+
+          const cb=document.createElement('input');
+          cb.type='checkbox';
+          cb.id='cb_'+div.dataset.taskIndex;
+
+          const lbl=document.createElement('label');
+          lbl.htmlFor=cb.id;
+          lbl.textContent=displayText;
+
+          div.appendChild(cb);
+          div.appendChild(lbl);
+
+          attachCheckboxLogic(cb, div);
+
+          itemsContainer.appendChild(div);
+        }
       });
 
       updateProgressBar();
@@ -751,8 +897,8 @@
       }
 
       body+=`\nKommentar:\n${comment.value||''}\n\nDato: ${homeDate.value||''}\n`;
-      const r1=localStorage.getItem(LS_REC1)||rec1.value||'';
-      const r2=localStorage.getItem(LS_REC2)||rec2.value||'';
+      const r1=localStorage.getItem(STORAGE_KEYS.recipient1)||rec1.value||'';
+      const r2=localStorage.getItem(STORAGE_KEYS.recipient2)||rec2.value||'';
       const recs=[r1,r2].filter(x=>x&&x.trim());
 
       if(recs.length===0){
@@ -763,87 +909,87 @@
     }
     btnSend.addEventListener('click',buildAndSend);
 
-    // Indstillinger via inline display
     btnOpenSettings.addEventListener('click',()=>{
       loadRecipients();
-      modalSettings.style.display='flex';
+      // sæt dropdown til aktuelt tema
+      const currentTheme = document.body.classList.contains('dark') ? 'dark' : 'light';
+      themeSelect.value = currentTheme;
+      show(modalSettings,'flex');
       modalSettings.setAttribute('aria-hidden','false');
     });
+
     function closeSettings(){
       saveRecipients();
-      modalSettings.style.display='none';
+      hide(modalSettings);
       modalSettings.setAttribute('aria-hidden','true');
     }
     btnCloseSettings.addEventListener('click',closeSettings);
     btnCloseAlt.addEventListener('click',closeSettings);
 
     function saveRecipients(){
-      localStorage.setItem(LS_REC1,rec1.value||'');
-      localStorage.setItem(LS_REC2,rec2.value||'');
+      localStorage.setItem(STORAGE_KEYS.recipient1,rec1.value||'');
+      localStorage.setItem(STORAGE_KEYS.recipient2,rec2.value||'');
     }
     function loadRecipients(){
-      rec1.value=localStorage.getItem(LS_REC1)||'';
-      rec2.value=localStorage.getItem(LS_REC2)||'';
+      rec1.value=localStorage.getItem(STORAGE_KEYS.recipient1)||'';
+      rec2.value=localStorage.getItem(STORAGE_KEYS.recipient2)||'';
     }
 
-    // Dark mode
     function applyTheme(theme){
       if(theme === 'dark'){
         document.body.classList.add('dark');
-        if(btnToggleTheme) btnToggleTheme.textContent = '☀️';
       } else {
         document.body.classList.remove('dark');
-        if(btnToggleTheme) btnToggleTheme.textContent = '🌙';
       }
+      localStorage.setItem(STORAGE_KEYS.theme, theme);
+      if(themeSelect) themeSelect.value = theme;
     }
 
-    const storedTheme = localStorage.getItem(THEME_KEY) || 'light';
+    const storedTheme = localStorage.getItem(STORAGE_KEYS.theme) || 'light';
     applyTheme(storedTheme);
 
-    if(btnToggleTheme){
-      btnToggleTheme.addEventListener('click', () => {
-        const newTheme = document.body.classList.contains('dark') ? 'light' : 'dark';
-        applyTheme(newTheme);
-        localStorage.setItem(THEME_KEY, newTheme);
+    if(themeSelect){
+      themeSelect.addEventListener('change', () => {
+        applyTheme(themeSelect.value);
       });
     }
 
-    // Start og tilbage navigation
     btnStart.addEventListener('click',()=>{
-      workHelp.style.display='none';
-      workRequired.style.display='none';
+      hide(workHelp);
+      hide(workRequired);
 
       if(!homeWorkNr.value||homeWorkNr.value.trim()===''){
-        workRequired.style.display='block';
+        show(workRequired);
         return;
       }
       if(!/^\d{5}$/.test(homeWorkNr.value||'')){
-        workHelp.style.display='block';
+        show(workHelp);
         return;
       }
 
       renderChecklist(homeChecklistSelect.value);
-      pageHome.style.display='none';
-      pageChecklist.style.display='block';
+      hide(pageHome);
+      show(pageChecklist);
       adjustProgressTop();
       updateProgressBar();
       window.scrollTo(0,0);
     });
 
     btnBack.addEventListener('click',()=>{
-      pageChecklist.style.display='none';
-      pageHome.style.display='block';
-      progressWrapper.style.display='none';
+      hide(pageChecklist);
+      show(pageHome);
+      hide(progressWrapper);
       progressFill.style.width='0%';
       progressText.textContent='0% · 0/0';
-      progressHint.style.display='none';
+      hide(progressHint);
       currentChecklistName=null;
+      if(progressTrack) progressTrack.setAttribute('aria-valuenow','0');
       window.scrollTo(0,0);
     });
 
     homeWorkNr.addEventListener('input',()=>{
-      workHelp.style.display='none';
-      workRequired.style.display='none';
+      hide(workHelp);
+      hide(workRequired);
       homeWorkNr.value=(homeWorkNr.value||'').replace(/[^\d]/g,'').slice(0,5);
     });
 
@@ -863,10 +1009,11 @@
           homeChecklistSelect.appendChild(o);
         });
 
-        workHelp.style.display='none';
-        workRequired.style.display='none';
+        loadRecipients();
         adjustProgressTop();
-        progressWrapper.style.display='none';
+        hide(progressWrapper);
+        hide(workHelp);
+        hide(workRequired);
       }catch(e){
         console.error('Kritisk fejl under initialisering:',e);
       }
