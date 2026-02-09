@@ -15,6 +15,9 @@
       --heading-color:#1A237E;
       --note-bg:#FFFDE7;
       --note-color:#757575;
+      --minus-red:#b91c1c;
+      --minus-bg:#fee2e2;
+      --minus-border:#dc2626;
     }
 
     body.dark{
@@ -152,6 +155,44 @@
       color:#d1d5db;
     }
 
+    #minusToggleBar{
+      display:none;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      margin-top:4px;
+    }
+    #btnMinusMode{
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid var(--minus-border);
+      background:var(--minus-bg);
+      color:var(--minus-red);
+      font-size:13px;
+      font-weight:600;
+      cursor:pointer;
+    }
+    #btnMinusMode.active{
+      background:var(--minus-red);
+      color:#fff;
+    }
+    body.dark #btnMinusMode{
+      background:#7f1d1d;
+      border-color:#ef4444;
+      color:#fee2e2;
+    }
+    body.dark #btnMinusMode.active{
+      background:#b91c1c;
+      color:#fff;
+    }
+    #minusHintText{
+      font-size:11px;
+      color:#6b7280;
+    }
+    body.dark #minusHintText{
+      color:#d1d5db;
+    }
+
     .card{
       background-color:var(--card);
       border-radius:8px;
@@ -250,31 +291,16 @@
       cursor:pointer;
       outline:none;
       transition:border-color .2s ease, background .2s ease, transform .15s ease;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:700;
+      font-size:14px;
+      color:#fff;
     }
     body.dark .item.task input[type="checkbox"]{
       background:#111827;
       border-color:#4b5563;
-    }
-    .item.task input[type="checkbox"]::before{
-      content:'';
-      position:absolute;
-      left:4px;
-      top:3px;
-      width:8px;
-      height:12px;
-      border-right:2px solid #fff;
-      border-bottom:2px solid #fff;
-      transform:rotate(35deg) scale(0);
-      transform-origin:bottom left;
-      transition:transform .2s ease-out;
-    }
-    .item.task input[type="checkbox"]:checked{
-      background:var(--rock-red);
-      border-color:var(--rock-red);
-      transform:scale(1.05);
-    }
-    .item.task input[type="checkbox"]:checked::before{
-      transform:rotate(35deg) scale(1);
     }
 
     .done{
@@ -282,6 +308,33 @@
       color:var(--rock-red);
       text-decoration:line-through;
       text-decoration-color:var(--rock-red);
+    }
+
+    .item.task.minus-state label{
+      color:var(--minus-red);
+      text-decoration:underline;
+    }
+
+    #minusSection{
+      margin-top:12px;
+      border-top:1px dashed #fecaca;
+      padding-top:8px;
+    }
+    #minusSection summary{
+      font-weight:700;
+      cursor:pointer;
+      padding:8px 6px;
+      color:var(--minus-red);
+    }
+    #minusContainer .minus-item{
+      font-size:13px;
+      padding:6px 4px;
+      border-bottom:1px solid #fee2e2;
+    }
+    #minusContainer .minus-comment{
+      font-style:italic;
+      color:#6b7280;
+      margin-left:10px;
     }
 
     .item.heading{
@@ -366,6 +419,36 @@
       gap:10px;
       justify-content:flex-end;
     }
+
+    #btnToggleLock.lock-locked{
+      background:#b91c1c;
+      border-color:#b91c1c;
+      color:#fff;
+    }
+    #btnToggleLock.lock-unlocked{
+      background:#16a34a;
+      border-color:#16a34a;
+      color:#fff;
+    }
+    body.dark #btnToggleLock.lock-locked{
+      background:#7f1d1d;
+      border-color:#7f1d1d;
+    }
+    body.dark #btnToggleLock.lock-unlocked{
+      background:#15803d;
+      border-color:#15803d;
+    }
+
+    @media (max-width: 480px) {
+      body { font-size: 16px; }
+      main { padding: 10px; }
+      header { padding: 10px; }
+      header h1 { font-size: 18px; }
+      .small { font-size: 14px; }
+      .item { padding: 8px 6px; }
+      button { padding: 12px 14px; font-size: 15px; }
+      .item.task input[type="checkbox"] { width: 24px; height: 24px; }
+    }
   </style>
 </head>
 <body>
@@ -384,6 +467,11 @@
       <div id="progressText" class="progress-text">0% · 0/0</div>
     </div>
     <div id="progressHint" style="display:none">Du mangler 0 opgaver</div>
+
+    <div id="minusToggleBar">
+      <button id="btnMinusMode" type="button">Minus til næste opgave</button>
+      <span id="minusHintText">Aktiver for at markere én opgave som minus (kræver kommentar).</span>
+    </div>
   </div>
 
   <main>
@@ -391,10 +479,9 @@
       <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
         <div>
           <div style="font-weight:800">Checklister</div>
-          <div class="small">Vælg liste, udfyld arbejdsnummer og dato.</div>
+          <div class="small">Vælg liste, udfyld arbejdsnummer. Dato låses til i dag.</div>
         </div>
         <div style="display:flex;gap:8px;align-items:center">
-          <!-- Kun tandhjul på forsiden -->
           <button id="btnOpenSettings" class="ghost" title="Indstillinger">⚙️</button>
         </div>
       </div>
@@ -406,7 +493,7 @@
         </div>
         <div style="width:180px">
           <label>Dato</label>
-          <input id="homeDate" type="date"/>
+          <input id="homeDate" type="date" readonly/>
         </div>
       </div>
 
@@ -439,6 +526,11 @@
         <div id="completedContainer" class="list-items"></div>
       </details>
 
+      <details id="minusSection" style="display:none">
+        <summary id="minusSummary">Fejl / afvigelser (0)</summary>
+        <div id="minusContainer"></div>
+      </details>
+
       <div style="margin-top:12px">
         <label>Kommentar (valgfri)</label>
         <textarea id="comment"></textarea>
@@ -457,16 +549,23 @@
         <div style="display:flex;justify-content:space-between;align-items:center">
           <div>
             <strong>Indstillinger</strong>
-            <div class="small">Tema og modtager-e-mails.</div>
+            <div class="small">Tema, modtager-e-mails og låsning.</div>
           </div>
           <div><button id="btnCloseSettings" class="close-btn">Luk</button></div>
         </div>
+
         <div style="margin-top:10px">
           <label for="themeSelect">Tema</label>
           <select id="themeSelect">
             <option value="light">Lys tilstand</option>
             <option value="dark">Mørk tilstand</option>
           </select>
+
+          <div style="margin-top:12px;display:flex;align-items:center;gap:8px">
+            <label style="margin:0;">Lås modtagere</label>
+            <button id="btnToggleLock" class="btn-small">Lås / lås op</button>
+          </div>
+          <div id="lockStatus" class="small" style="margin-top:4px;color:#6b7280;"></div>
 
           <label style="margin-top:12px">Modtager 1</label>
           <input id="rec1" type="email" placeholder="modtager1@firma.dk"/>
@@ -489,7 +588,9 @@
     const STORAGE_KEYS = {
       recipient1: 'rg_rec1',
       recipient2: 'rg_rec2',
-      theme:      'checklister_theme'
+      theme:      'checklister_theme',
+      lockState:  'checklister_lock_state',
+      lockPin:    'checklister_lock_pin'
     };
 
     const headerEl=document.getElementById('mainHeader')||document.querySelector('header');
@@ -498,6 +599,9 @@
     const progressText=document.getElementById('progressText');
     const progressHint=document.getElementById('progressHint');
     const progressTrack=document.querySelector('.progress-track');
+    const minusToggleBar=document.getElementById('minusToggleBar');
+    const btnMinusMode=document.getElementById('btnMinusMode');
+    const minusHintText=document.getElementById('minusHintText');
 
     const pageHome=document.getElementById('page-home');
     const pageChecklist=document.getElementById('page-checklist');
@@ -512,6 +616,9 @@
     const completedContainer=document.getElementById('completedContainer');
     const completedSection=document.getElementById('completedSection');
     const completedSummary=document.getElementById('completedSummary');
+    const minusSection=document.getElementById('minusSection');
+    const minusContainer=document.getElementById('minusContainer');
+    const minusSummary=document.getElementById('minusSummary');
     const comment=document.getElementById('comment');
     const workHelp=document.getElementById('workHelp');
     const workRequired=document.getElementById('workRequired');
@@ -525,6 +632,8 @@
     const rec1=document.getElementById('rec1');
     const rec2=document.getElementById('rec2');
     const themeSelect=document.getElementById('themeSelect');
+    const btnToggleLock=document.getElementById('btnToggleLock');
+    const lockStatus=document.getElementById('lockStatus');
 
     const headingWhitelist = [
       "Smeltestart",
@@ -651,16 +760,11 @@
     };
 
     let currentChecklistName=null;
-    let checkedMap={};
+    let taskStateMap = {};
+    let minusModeActive = false;
 
-    function show(el, display='block'){
-      if (!el) return;
-      el.style.display = display;
-    }
-    function hide(el){
-      if (!el) return;
-      el.style.display = 'none';
-    }
+    function show(el, display='block'){ if(el) el.style.display=display; }
+    function hide(el){ if(el) el.style.display='none'; }
 
     function adjustProgressTop(){
       progressWrapper.style.top=(headerEl.offsetHeight)+'px';
@@ -688,6 +792,25 @@
       return !isHeading(text) && !isNote(text);
     }
 
+    function initTaskState(idx){
+      if(!taskStateMap[idx]){
+        taskStateMap[idx] = { checked:false, minus:false, comment:'' };
+      }
+      return taskStateMap[idx];
+    }
+
+    function setTaskChecked(idx, value){
+      const s = initTaskState(idx);
+      s.checked = !!value;
+      if (value) s.minus = false;
+    }
+
+    function setTaskMinus(idx, value){
+      const s = initTaskState(idx);
+      s.minus = !!value;
+      if (value) s.checked = false;
+    }
+
     function getTaskCountsFromDom(){
       const cbsInMain=itemsContainer.querySelectorAll('.item.task input[type="checkbox"]');
       const cbsInCompleted=completedContainer.querySelectorAll('.item.task input[type="checkbox"]');
@@ -696,6 +819,49 @@
       cbsInMain.forEach(cb=>{ if(cb.checked) checkedTasks++; });
       cbsInCompleted.forEach(cb=>{ if(cb.checked) checkedTasks++; });
       return { totalTasks, checkedTasks };
+    }
+
+    function updateCompletedSummary() {
+      const doneCount = completedContainer.querySelectorAll('.item.task').length;
+      if (doneCount === 0) hide(completedSection); else show(completedSection);
+      completedSummary.textContent = `Udførte opgaver (${doneCount})`;
+    }
+
+    function updateMinusSummary(){
+      const count = minusContainer.querySelectorAll('.minus-item').length;
+      if(count===0) hide(minusSection); else show(minusSection);
+      minusSummary.textContent = `Fejl / afvigelser (${count})`;
+    }
+
+    function updateMinusListForTask(idx, text){
+      const state = taskStateMap[idx];
+      const existing = minusContainer.querySelector(`.minus-item[data-task-index="${idx}"]`);
+      if(state && state.minus){
+        const commentText = state.comment || '';
+        if(existing){
+          existing.querySelector('.minus-text').textContent = text;
+          existing.querySelector('.minus-comment').textContent = commentText ? `Kommentar: ${commentText}` : '';
+        } else {
+          const div=document.createElement('div');
+          div.className='minus-item';
+          div.dataset.taskIndex=idx;
+
+          const txt=document.createElement('div');
+          txt.className='minus-text';
+          txt.textContent=text;
+
+          const cmt=document.createElement('div');
+          cmt.className='minus-comment';
+          cmt.textContent=commentText ? `Kommentar: ${commentText}` : '';
+
+          div.appendChild(txt);
+          div.appendChild(cmt);
+          minusContainer.appendChild(div);
+        }
+      } else if(existing){
+        minusContainer.removeChild(existing);
+      }
+      updateMinusSummary();
     }
 
     function updateProgressBar(){
@@ -716,308 +882,4 @@
       const remaining = totalTasks - checkedTasks;
 
       progressFill.style.width=pct+'%';
-      progressFill.style.backgroundColor=getComputedStyle(document.documentElement).getPropertyValue('--rock-red') || '#E60028';
-      progressText.textContent=`${pct}% · ${checkedTasks}/${totalTasks}`;
-
-      if(remaining > 0){
-        progressHint.textContent = `Du mangler ${remaining} opgave${remaining === 1 ? '' : 'r'}`;
-      } else {
-        progressHint.textContent = 'Alle opgaver er udført – klar til at sende';
-      }
-      show(progressHint);
-
-      if (progressTrack) progressTrack.setAttribute('aria-valuenow', String(pct));
-      show(progressWrapper,'flex');
-      checkAllAndShowSend();
-    }
-
-    function checkAllAndShowSend(){
-      if(pageChecklist.style.display==='none') return;
-      const { totalTasks, checkedTasks } = getTaskCountsFromDom();
-      btnSend.style.display=(checkedTasks===totalTasks && totalTasks>0)?'block':'none';
-    }
-
-    function attachCheckboxLogic(cb, div){
-      cb.addEventListener('change', e=>{
-        const idx=parseInt(div.dataset.taskIndex,10);
-        const checked = !!e.target.checked;
-        checkedMap[idx]=checked;
-
-        if(checked){
-          div.classList.add('done');
-          setTimeout(() => {
-            completedContainer.appendChild(div);
-            show(completedSection);
-            completedSummary.textContent='Udførte opgaver ('+completedContainer.children.length+')';
-          }, 250);
-        } else {
-          div.classList.remove('done');
-          insertInOrder(div, itemsContainer, parseInt(div.dataset.originalIndex,10));
-          if(completedContainer.children.length===0){
-            hide(completedSection);
-            completedSummary.textContent='Udførte opgaver (0)';
-          } else {
-            completedSummary.textContent='Udførte opgaver ('+completedContainer.children.length+')';
-          }
-        }
-        updateProgressBar();
-      });
-    }
-
-    function renderChecklist(name){
-      currentChecklistName=name;
-      checkedMap={};
-
-      chkTitle.textContent=name;
-      chkMeta.textContent=`Arbejdsnummer: ${homeWorkNr.value||''} · Dato: ${homeDate.value||''}`;
-      itemsContainer.innerHTML='';
-      completedContainer.innerHTML='';
-      hide(completedSection);
-      completedSummary.textContent='Udførte opgaver (0)';
-      hide(btnSend);
-
-      const items=checklists[name]||[];
-      let taskIndex=0;
-
-      items.forEach((t,i)=>{
-        const div=document.createElement('div');
-        const originalText=t.trim();
-        let displayText=originalText;
-        const is_task=isTask(originalText);
-
-        div.dataset.originalIndex=i;
-
-        if(is_task){
-          div.className='item task';
-          div.dataset.taskIndex=taskIndex;
-          taskIndex++;
-
-          const cb=document.createElement('input');
-          cb.type='checkbox';
-          cb.id='cb_'+div.dataset.taskIndex;
-
-          const lbl=document.createElement('label');
-          lbl.htmlFor=cb.id;
-          lbl.textContent=displayText;
-
-          div.appendChild(cb);
-          div.appendChild(lbl);
-
-          attachCheckboxLogic(cb, div);
-
-          itemsContainer.appendChild(div);
-        } else if(isNote(originalText)){
-          div.className='item note';
-          const lbl=document.createElement('label');
-          lbl.textContent=displayText;
-          div.appendChild(lbl);
-          itemsContainer.appendChild(div);
-        } else if(isHeading(originalText)){
-          div.className='item heading';
-          if(displayText.endsWith('.')) displayText=displayText.slice(0,-1);
-          const lbl=document.createElement('label');
-          lbl.textContent=displayText;
-          div.appendChild(lbl);
-          itemsContainer.appendChild(div);
-        } else {
-          div.className='item task';
-          div.dataset.taskIndex=taskIndex;
-          taskIndex++;
-
-          const cb=document.createElement('input');
-          cb.type='checkbox';
-          cb.id='cb_'+div.dataset.taskIndex;
-
-          const lbl=document.createElement('label');
-          lbl.htmlFor=cb.id;
-          lbl.textContent=displayText;
-
-          div.appendChild(cb);
-          div.appendChild(lbl);
-
-          attachCheckboxLogic(cb, div);
-
-          itemsContainer.appendChild(div);
-        }
-      });
-
-      updateProgressBar();
-      adjustProgressTop();
-    }
-
-    function insertInOrder(element, container, originalIndex){
-      const containerItems=Array.from(container.children).filter(el=>el.dataset.originalIndex!==undefined);
-      let nextElement=null;
-      for(const item of containerItems){
-        const itemIndex=parseInt(item.dataset.originalIndex,10);
-        if(itemIndex>originalIndex){
-          nextElement=item;
-          break;
-        }
-      }
-      if(nextElement){
-        container.insertBefore(element,nextElement);
-      } else {
-        container.appendChild(element);
-      }
-    }
-
-    btnClearAll.addEventListener('click',()=>{
-      if(!currentChecklistName)return;
-      if(!confirm('Er du sikker på, at du vil fjerne alle markeringer?'))return;
-      const allTaskCheckboxes=document.querySelectorAll('.item.task input[type="checkbox"]');
-      allTaskCheckboxes.forEach(cb=>{
-        if(cb.checked){
-          cb.checked=false;
-          cb.dispatchEvent(new Event('change'));
-        }
-      });
-    });
-
-    function buildAndSend(){
-      const name=currentChecklistName;
-      const items=checklists[name]||[];
-      const when=new Date().toLocaleString();
-
-      let subject=`[CHECKLISTE] ${name} - ${homeWorkNr.value||'[ukendt]'} - ${when}`;
-      let body=`Arbejdsnummer: ${homeWorkNr.value||''}\nTidspunkt: ${when}\nChecklistetype: ${name}\n\nPunkter:\n`;
-
-      let taskIndex=0;
-      for(let i=0;i<items.length;i++){
-        const itemText=items[i];
-        if(isTask(itemText)){
-          const tick=checkedMap[taskIndex]?'[x]':'[ ]';
-          body+=`${tick} ${itemText}\n`;
-          taskIndex++;
-        } else if(isHeading(itemText)){
-          body+=`\n*** ${itemText.replace(/\.$/,'').toUpperCase()} ***\n`;
-        } else if(isNote(itemText)){
-          body+=`(${itemText})\n`;
-        }
-      }
-
-      body+=`\nKommentar:\n${comment.value||''}\n\nDato: ${homeDate.value||''}\n`;
-      const r1=localStorage.getItem(STORAGE_KEYS.recipient1)||rec1.value||'';
-      const r2=localStorage.getItem(STORAGE_KEYS.recipient2)||rec2.value||'';
-      const recs=[r1,r2].filter(x=>x&&x.trim());
-
-      if(recs.length===0){
-        if(!confirm('Ingen modtagere angivet. Fortsæt uden modtagere?'))return;
-      }
-
-      window.location.href=`mailto:${recs.join(',')}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    }
-    btnSend.addEventListener('click',buildAndSend);
-
-    btnOpenSettings.addEventListener('click',()=>{
-      loadRecipients();
-      // sæt dropdown til aktuelt tema
-      const currentTheme = document.body.classList.contains('dark') ? 'dark' : 'light';
-      themeSelect.value = currentTheme;
-      show(modalSettings,'flex');
-      modalSettings.setAttribute('aria-hidden','false');
-    });
-
-    function closeSettings(){
-      saveRecipients();
-      hide(modalSettings);
-      modalSettings.setAttribute('aria-hidden','true');
-    }
-    btnCloseSettings.addEventListener('click',closeSettings);
-    btnCloseAlt.addEventListener('click',closeSettings);
-
-    function saveRecipients(){
-      localStorage.setItem(STORAGE_KEYS.recipient1,rec1.value||'');
-      localStorage.setItem(STORAGE_KEYS.recipient2,rec2.value||'');
-    }
-    function loadRecipients(){
-      rec1.value=localStorage.getItem(STORAGE_KEYS.recipient1)||'';
-      rec2.value=localStorage.getItem(STORAGE_KEYS.recipient2)||'';
-    }
-
-    function applyTheme(theme){
-      if(theme === 'dark'){
-        document.body.classList.add('dark');
-      } else {
-        document.body.classList.remove('dark');
-      }
-      localStorage.setItem(STORAGE_KEYS.theme, theme);
-      if(themeSelect) themeSelect.value = theme;
-    }
-
-    const storedTheme = localStorage.getItem(STORAGE_KEYS.theme) || 'light';
-    applyTheme(storedTheme);
-
-    if(themeSelect){
-      themeSelect.addEventListener('change', () => {
-        applyTheme(themeSelect.value);
-      });
-    }
-
-    btnStart.addEventListener('click',()=>{
-      hide(workHelp);
-      hide(workRequired);
-
-      if(!homeWorkNr.value||homeWorkNr.value.trim()===''){
-        show(workRequired);
-        return;
-      }
-      if(!/^\d{5}$/.test(homeWorkNr.value||'')){
-        show(workHelp);
-        return;
-      }
-
-      renderChecklist(homeChecklistSelect.value);
-      hide(pageHome);
-      show(pageChecklist);
-      adjustProgressTop();
-      updateProgressBar();
-      window.scrollTo(0,0);
-    });
-
-    btnBack.addEventListener('click',()=>{
-      hide(pageChecklist);
-      show(pageHome);
-      hide(progressWrapper);
-      progressFill.style.width='0%';
-      progressText.textContent='0% · 0/0';
-      hide(progressHint);
-      currentChecklistName=null;
-      if(progressTrack) progressTrack.setAttribute('aria-valuenow','0');
-      window.scrollTo(0,0);
-    });
-
-    homeWorkNr.addEventListener('input',()=>{
-      hide(workHelp);
-      hide(workRequired);
-      homeWorkNr.value=(homeWorkNr.value||'').replace(/[^\d]/g,'').slice(0,5);
-    });
-
-    (function init(){
-      try{
-        const d=new Date();
-        const year=d.getFullYear();
-        const month=String(d.getMonth()+1).padStart(2,'0');
-        const day=String(d.getDate()).padStart(2,'0');
-        homeDate.value=`${year}-${month}-${day}`;
-
-        homeChecklistSelect.innerHTML='';
-        Object.keys(checklists).forEach(k=>{
-          const o=document.createElement('option');
-          o.value=k;
-          o.textContent=k;
-          homeChecklistSelect.appendChild(o);
-        });
-
-        loadRecipients();
-        adjustProgressTop();
-        hide(progressWrapper);
-        hide(workHelp);
-        hide(workRequired);
-      }catch(e){
-        console.error('Kritisk fejl under initialisering:',e);
-      }
-    })();
-  </script>
-</body>
-</html>
+      progressText.textContent=`${pct}% ·
