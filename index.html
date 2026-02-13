@@ -246,7 +246,7 @@
     button.ghost{
       background:#fff;
       color:var(--rock-red);
-      border:1px solid var(--rock-red);
+      border:1px solid(var(--rock-red));
     }
     body.dark button{
       background:#b3001f;
@@ -560,7 +560,9 @@
         <button id="btnSend" style="display:none;flex-grow:1;">Send</button>
       </div>
 
-      <div class="meta small" style="margin-top:8px">Tryk Send når alle punkter er afkrydset eller markeret minus for at sende checklisten.</div>
+      <div class="meta small" style="margin-top:8px">
+        Tryk Send når alle punkter er afkrydset eller markeret minus for at sende checklisten.
+      </div>
     </section>
 
     <div id="modalSettings" class="modal" style="display:none" aria-hidden="true">
@@ -838,13 +840,17 @@
       }
     }
 
-    // NY: Tæl udførte opgaver via taskStateMap, så både checked og minus tæller
+    // VIGTIGT: Tæl færdige opgaver via DOM
     function getTaskCountsFromDom(){
-      let totalTasks = Object.keys(taskStateMap).length;
-      let doneTasks = 0;
+      const allTasks = document.querySelectorAll('.item.task');
+      const totalTasks = allTasks.length;
 
-      Object.values(taskStateMap).forEach(state => {
-        if (state.checked || state.minus) {
+      let doneTasks = 0;
+      allTasks.forEach(task => {
+        const cb = task.querySelector('input[type="checkbox"]');
+        const isMinus = task.classList.contains('minus-state');
+        const isChecked = cb && cb.checked;
+        if (isChecked || isMinus) {
           doneTasks++;
         }
       });
@@ -887,7 +893,7 @@
       progressText.textContent=`${pct}% · ${checkedTasks}/${totalTasks}`;
 
       if(remaining > 0){
-        progressHint.textContent = `Du mangler ${remaining} opgave${remaining === 1 ? '' : 'r'} (inkl. evt. minus-opgaver)`;
+        progressHint.textContent = `Du mangler ${remaining} opgave${remaining === 1 ? '' : 'r'}`;
       } else {
         progressHint.textContent = 'Alle opgaver er udført eller markeret minus – klar til at sende';
       }
