@@ -18,7 +18,6 @@
       --minus-red:#b91c1c;
       --minus-bg:#fee2e2;
       --minus-border:#dc2626;
-      --minus-green:#16a34a;
     }
 
     body.dark{
@@ -31,53 +30,12 @@
       --note-bg:#111827;
       --note-color:#d1d5db;
     }
-    body.dark header{
-      background:#b3001f;
-    }
-    body.dark .card{
-      box-shadow:0 1px 4px rgba(0,0,0,.7);
-    }
-    body.dark input,
-    body.dark select,
-    body.dark textarea{
-      background:#111827;
-      border-color:#374151;
-      color:#f9fafb;
-    }
-    body.dark .item{
-      border-bottom:1px solid #374151;
-    }
-    body.dark .progress-track{
-      background:#111827;
-    }
-    body.dark #progressWrapper{
-      background:rgba(15,23,42,0.96);
-      border-bottom:1px solid #374151;
-    }
-    body.dark .progress-text{
-      color:#e5e7eb;
-    }
-    body.dark .modal-card{
-      background:var(--card);
-      color:var(--text);
-    }
-    body.dark .modal{
-      background:rgba(0,0,0,0.8);
-    }
 
     html,body{
       margin:0;
       font-family:system-ui,Roboto,Arial;
       background-color:var(--bg);
       color:var(--text);
-    }
-    body{
-      min-height:100vh;
-    }
-    body.dark html,
-    body.dark{
-      background-color:var(--bg) !important;
-      color:var(--text) !important;
     }
 
     main{
@@ -122,9 +80,6 @@
       overflow:hidden;
       position:relative;
     }
-    body.dark .progress-track{
-      background:#111827;
-    }
 
     .progress-fill{
       height:100%;
@@ -145,15 +100,9 @@
       color:#374151;
       white-space:nowrap;
     }
-    body.dark .progress-text{
-      color:#e5e7eb;
-    }
     #progressHint{
       font-size:11px;
       color:#555;
-    }
-    body.dark #progressHint{
-      color:#d1d5db;
     }
 
     #minusToggleBar{
@@ -177,21 +126,9 @@
       background:var(--minus-red);
       color:#fff;
     }
-    body.dark #btnMinusMode{
-      background:#7f1d1d;
-      border-color:#ef4444;
-      color:#fee2e2;
-    }
-    body.dark #btnMinusMode.active{
-      background:#b91c1c;
-      color:#fff;
-    }
     #minusHintText{
       font-size:11px;
       color:#6b7280;
-    }
-    body.dark #minusHintText{
-      color:#d1d5db;
     }
 
     .card{
@@ -214,13 +151,6 @@
       color:#111827;
     }
     textarea{min-height:100px}
-    body.dark input,
-    body.dark select,
-    body.dark textarea{
-      background-color:#111827;
-      border-color:#374151;
-      color:#f9fafb;
-    }
 
     .row{display:flex;gap:10px;flex-wrap:wrap}
     .col{flex:1;min-width:160px}
@@ -247,16 +177,6 @@
       color:var(--rock-red);
       border:1px solid var(--rock-red);
     }
-    body.dark button{
-      background:#b3001f;
-      color:#f9fafb;
-      border-color:#b3001f;
-    }
-    body.dark button.ghost{
-      background:transparent;
-      color:#fca5a5;
-      border-color:#fca5a5;
-    }
 
     .small{font-size:13px;color:var(--muted)}
 
@@ -267,9 +187,6 @@
       align-items:flex-start;
       padding:10px 8px;
       border-bottom:1px solid #e5e7eb;
-    }
-    body.dark .item{
-      border-bottom:1px solid #374151;
     }
     .item label{
       flex:1;
@@ -286,16 +203,11 @@
       border-radius:4px;
       border:2px solid #cbd5e1;
       appearance:none;
-      -webkit-appearance:none;
       background:#fff;
       position:relative;
       cursor:pointer;
       outline:none;
       transition:border-color .2s ease, background .2s ease, transform .15s ease;
-    }
-    body.dark .item.task input[type="checkbox"]{
-      background:#111827;
-      border-color:#4b5563;
     }
     .item.task input[type="checkbox"]::before{
       content:'';
@@ -317,6 +229,25 @@
     }
     .item.task input[type="checkbox"]:checked::before{
       transform:rotate(35deg) scale(1);
+    }
+
+    /* VISUELT MINUS I CHECKBOKSEN */
+    .item.task input[type="checkbox"].minus-checked{
+      background:var(--minus-bg);
+      border-color:var(--minus-red);
+    }
+    .item.task input[type="checkbox"].minus-checked::before{
+      content:'−';
+      position:absolute;
+      left:50%;
+      top:50%;
+      transform:translate(-50%, -55%);
+      width:auto;
+      height:auto;
+      border:none;
+      color:var(--minus-red);
+      font-weight:900;
+      font-size:16px;
     }
 
     .done{
@@ -375,84 +306,6 @@
     .helper{font-size:13px;color:#b12727;margin-top:6px}
     footer{color:var(--muted);text-align:center;margin:20px 0}
     .btn-small{padding:5px 8px;font-size:12px;border-radius:6px}
-
-    .modal{
-      position:fixed;
-      top:0;
-      left:0;
-      width:100%;
-      height:100%;
-      background:rgba(0,0,0,0.7);
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      z-index:2000;
-    }
-    .modal-card{
-      background:var(--card);
-      padding:20px;
-      border-radius:8px;
-      max-width:90%;
-      min-width:300px;
-      box-shadow:0 4px 10px rgba(0,0,0,0.3);
-    }
-    .modal .close-btn{
-      background:none;
-      border:none;
-      color:var(--rock-red);
-      font-weight:600;
-      cursor:pointer;
-      padding:5px;
-    }
-    body.dark .modal .close-btn{
-      color:#fca5a5;
-    }
-    .modal-actions{
-      margin-top:10px;
-      display:flex;
-      gap:10px;
-      justify-content:flex-end;
-    }
-
-    #btnToggleLock.lock-locked{
-      background:#b91c1c;
-      border-color:#b91c1c;
-      color:#fff;
-    }
-    #btnToggleLock.lock-unlocked{
-      background:#16a34a;
-      border-color:#16a34a;
-      color:#fff;
-    }
-    body.dark #btnToggleLock.lock-locked{
-      background:#7f1d1d;
-      border-color:#7f1d1d;
-    }
-    body.dark #btnToggleLock.lock-unlocked{
-      background:#15803d;
-      border-color:#15803d;
-    }
-
-    #page-checklist{
-      margin-top:8px;
-    }
-
-    @media (max-width: 480px) {
-      body { font-size: 16px; }
-      main { padding: 10px; }
-      header { padding: 10px; }
-      header h1 { font-size: 18px; }
-      .small { font-size: 14px; }
-      .item { padding: 8px 6px; }
-      button {
-        padding: 12px 14px;
-        font-size: 15px;
-      }
-      .item.task input[type="checkbox"] {
-        width: 24px;
-        height: 24px;
-      }
-    }
   </style>
 </head>
 <body>
@@ -486,6 +339,7 @@
           <div class="small">Vælg liste, udfyld arbejdsnummer. Dato låses til i dag.</div>
         </div>
         <div style="display:flex;gap:8px;align-items:center">
+          <!-- Indstillinger-knap, kan evt. kobles på modal -->
           <button id="btnOpenSettings" class="ghost" title="Indstillinger">⚙️</button>
         </div>
       </div>
@@ -540,46 +394,10 @@
         <button id="btnSend" style="display:none;flex-grow:1;">Send</button>
       </div>
 
-      <div class="meta small" style="margin-top:8px">
-        Tryk Send når alle punkter er afkrydset eller markeret minus for at sende checklisten.
+      <div class="small" style="margin-top:8px">
+        Tryk Send når alle punkter er afkrydset eller markeret minus.
       </div>
     </section>
-
-    <div id="modalSettings" class="modal" style="display:none" aria-hidden="true">
-      <div class="modal-card">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <div>
-            <strong>Indstillinger</strong>
-            <div class="small">Tema, modtager-e-mails og låsning.</div>
-          </div>
-          <div><button id="btnCloseSettings" class="close-btn">Luk</button></div>
-        </div>
-
-        <div style="margin-top:10px">
-          <label for="themeSelect">Tema</label>
-          <select id="themeSelect">
-            <option value="light">Lys tilstand</option>
-            <option value="dark">Mørk tilstand</option>
-          </select>
-
-          <div style="margin-top:12px;display:flex;align-items:center;gap:8px">
-            <label style="margin:0;">Lås modtagere</label>
-            <button id="btnToggleLock" class="btn-small">Lås / lås op</button>
-          </div>
-          <div id="lockStatus" class="small" style="margin-top:4px;color:#6b7280;"></div>
-
-          <label style="margin-top:12px">Modtager 1</label>
-          <input id="rec1" type="email" placeholder="modtager1@firma.dk"/>
-
-          <label style="margin-top:8px">Modtager 2</label>
-          <input id="rec2" type="email" placeholder="modtager2@firma.dk"/>
-
-          <div class="modal-actions">
-            <button id="btnCloseAlt" class="ghost">Luk</button>
-          </div>
-        </div>
-      </div>
-    </div>
   </main>
 
   <footer class="small">Enkel offline HTML‑app</footer>
@@ -588,12 +406,10 @@
     const STORAGE_KEYS = {
       recipient1: 'rg_rec1',
       recipient2: 'rg_rec2',
-      theme:      'checklister_theme',
-      lockState:  'checklister_lock_state',
-      lockPin:    'checklister_lock_pin'
+      theme:      'checklister_theme'
     };
 
-    const headerEl=document.getElementById('mainHeader')||document.querySelector('header');
+    const headerEl=document.getElementById('mainHeader');
     const progressWrapper=document.getElementById('progressWrapper');
     const progressFill=document.getElementById('progressFill');
     const progressText=document.getElementById('progressText');
@@ -621,16 +437,6 @@
     const workRequired=document.getElementById('workRequired');
     const btnSend=document.getElementById('btnSend');
     const btnClearAll=document.getElementById('btnClearAll');
-
-    const modalSettings=document.getElementById('modalSettings');
-    const btnOpenSettings=document.getElementById('btnOpenSettings');
-    const btnCloseSettings=document.getElementById('btnCloseSettings');
-    const btnCloseAlt=document.getElementById('btnCloseAlt');
-    const rec1=document.getElementById('rec1');
-    const rec2=document.getElementById('rec2');
-    const themeSelect=document.getElementById('themeSelect');
-    const btnToggleLock=document.getElementById('btnToggleLock');
-    const lockStatus=document.getElementById('lockStatus');
 
     const headingWhitelist = [
       "Smeltestart",
@@ -800,22 +606,11 @@
     let taskStateMap = {};
     let minusModeActive = false;
 
-    function show(el, display='block'){ if(el) el.style.display = display; }
-    function hide(el){ if(el) el.style.display = 'none'; }
+    function show(el, display='block'){ if(!el) return; el.style.display=display; }
+    function hide(el){ if(!el) return; el.style.display='none'; }
 
     function adjustProgressTop(){
-      const headerHeight = headerEl.offsetHeight;
-      progressWrapper.style.top = headerHeight + 'px';
-
-      const isChecklistVisible = pageChecklist.style.display !== 'none';
-      const isProgressVisible = progressWrapper.style.display !== 'none';
-
-      if (isChecklistVisible && isProgressVisible) {
-        const pwHeight = progressWrapper.offsetHeight || 40;
-        pageChecklist.style.marginTop = (pwHeight + 8) + 'px';
-      } else {
-        pageChecklist.style.marginTop = '8px';
-      }
+      progressWrapper.style.top=(headerEl.offsetHeight)+'px';
     }
     window.addEventListener('resize',adjustProgressTop);
 
@@ -828,12 +623,12 @@
 
     function isNote(text){
       const t=text.trim();
-      const infoPatterns=[
+      const patterns=[
         /^\d{1,2}\/\d{1,2}/,
         /dato/i, /navn/i, /mester/i, /lagam/i, /side \d+\/\d+/i,
         /eSOP/
       ];
-      return infoPatterns.some(pattern=>pattern.test(t));
+      return patterns.some(p=>p.test(t));
     }
 
     function isTask(text){
@@ -842,46 +637,59 @@
 
     function initTaskState(idx){
       if(!taskStateMap[idx]){
-        taskStateMap[idx] = { checked:false, minus:false, comment:'' };
+        taskStateMap[idx]={checked:false,minus:false,comment:''};
       }
       return taskStateMap[idx];
     }
 
-    function setTaskChecked(idx, value){
-      const s = initTaskState(idx);
-      s.checked = !!value;
-      if (value) s.minus = false;
+    function setTaskChecked(idx,val){
+      const s=initTaskState(idx);
+      s.checked=!!val;
+      if(val) s.minus=false;
     }
 
-    function setTaskMinus(idx, value){
-      const s = initTaskState(idx);
-      s.minus = !!value;
-      if (value) s.checked = false;
+    function setTaskMinus(idx,val){
+      const s=initTaskState(idx);
+      s.minus=!!val;
+      if(val) s.checked=false;
+    }
+
+    function applyMinusVisual(div){
+      const label=div.querySelector('label');
+      if(!label) return;
+      const text=label.textContent.trim().replace(/^[-–]\s*/,'');
+      label.textContent=`- ${text}`;
+    }
+    function removeMinusVisual(div){
+      const label=div.querySelector('label');
+      if(!label) return;
+      label.textContent=label.textContent.replace(/^[-–]\s*/,'');
+    }
+    function applyMinusCheckbox(cb){
+      cb.classList.add('minus-checked');
+    }
+    function removeMinusCheckbox(cb){
+      cb.classList.remove('minus-checked');
     }
 
     function getTaskCountsFromDom(){
-      const allTasks = document.querySelectorAll('.item.task');
-      const totalTasks = allTasks.length;
-
-      let doneTasks = 0;
-      allTasks.forEach(task => {
-        const cb = task.querySelector('input[type="checkbox"]');
-        const isMinus = task.classList.contains('minus-state');
-        const isChecked = cb && cb.checked;
-        if (isChecked || isMinus) doneTasks++;
+      const allTasks=document.querySelectorAll('.item.task');
+      const totalTasks=allTasks.length;
+      let done=0;
+      allTasks.forEach(task=>{
+        const cb=task.querySelector('input[type="checkbox"]');
+        const isMinus=task.classList.contains('minus-state');
+        const isChecked=cb && cb.checked;
+        if(isMinus || isChecked) done++;
       });
-
-      return { totalTasks, checkedTasks: doneTasks };
+      return { totalTasks, checkedTasks: done };
     }
 
-    function updateCompletedSummary() {
-      const doneCount = completedContainer.querySelectorAll('.item.task').length;
-      if (doneCount === 0) {
-        hide(completedSection);
-      } else {
-        show(completedSection);
-      }
-      completedSummary.textContent = `Udførte opgaver (${doneCount})`;
+    function updateCompletedSummary(){
+      const doneCount=completedContainer.querySelectorAll('.item.task').length;
+      if(doneCount===0) hide(completedSection);
+      else show(completedSection);
+      completedSummary.textContent=`Udførte opgaver (${doneCount})`;
     }
 
     function updateProgressBar(){
@@ -889,9 +697,7 @@
         hide(progressWrapper);
         return;
       }
-
-      const { totalTasks, checkedTasks } = getTaskCountsFromDom();
-
+      const { totalTasks, checkedTasks }=getTaskCountsFromDom();
       if(!totalTasks){
         hide(progressWrapper);
         progressText.textContent='0% · 0/0';
@@ -900,65 +706,65 @@
         if(progressTrack) progressTrack.setAttribute('aria-valuenow','0');
         return;
       }
-
       const pct=Math.round((checkedTasks/totalTasks)*100);
-      const remaining = totalTasks - checkedTasks;
+      const remaining=totalTasks-checkedTasks;
 
       progressFill.style.width=pct+'%';
-      progressFill.style.backgroundColor=getComputedStyle(document.documentElement).getPropertyValue('--rock-red') || '#E60028';
       progressText.textContent=`${pct}% · ${checkedTasks}/${totalTasks}`;
-
-      if(remaining > 0){
-        progressHint.textContent = `Du mangler ${remaining} opgave${remaining === 1 ? '' : 'r'}`;
-      } else {
-        progressHint.textContent = 'Alle opgaver er udført eller markeret minus – klar til at sende';
+      if(remaining>0){
+        progressHint.textContent=`Du mangler ${remaining} opgave${remaining===1?'':'r'}`;
+      }else{
+        progressHint.textContent='Alle opgaver er udført eller markeret minus – klar til at sende';
       }
       show(progressHint);
-
-      if (progressTrack) progressTrack.setAttribute('aria-valuenow', String(pct));
+      if(progressTrack) progressTrack.setAttribute('aria-valuenow',String(pct));
       show(progressWrapper,'flex');
       show(minusToggleBar,'flex');
       checkAllAndShowSend();
-      adjustProgressTop();
     }
 
     function checkAllAndShowSend(){
       if(pageChecklist.style.display==='none') return;
-      const { totalTasks, checkedTasks } = getTaskCountsFromDom();
+      const { totalTasks, checkedTasks }=getTaskCountsFromDom();
       btnSend.style.display=(checkedTasks===totalTasks && totalTasks>0)?'block':'none';
     }
 
-    function attachCheckboxLogic(cb, div){
-      cb.addEventListener('change', e=>{
+    function attachCheckboxLogic(cb,div){
+      cb.addEventListener('change',e=>{
         const idx=parseInt(div.dataset.taskIndex,10);
-        const state = initTaskState(idx);
+        const state=initTaskState(idx);
 
-        if (minusModeActive) {
-          minusModeActive = false;
+        if(minusModeActive){
+          minusModeActive=false;
           btnMinusMode.classList.remove('active');
-          minusHintText.textContent = 'Aktiver for at markere én opgave som minus (kræver kommentar).';
+          minusHintText.textContent='Aktiver for at markere én opgave som minus (kræver kommentar).';
 
-          cb.checked = false;
+          cb.checked=false;
+          removeMinusCheckbox(cb);
 
-          const existingComment = state.comment || '';
-          const commentText = prompt('Angiv kommentar til minus (påkrævet):', existingComment);
-          if (!commentText || commentText.trim()==='') {
+          const existingComment=state.comment||'';
+          const commentText=prompt('Angiv kommentar til minus (påkrævet):',existingComment);
+          if(!commentText || commentText.trim()===''){
             alert('Kommentar er påkrævet for minus. Opgaven markeres ikke som minus.');
             setTaskMinus(idx,false);
             div.classList.remove('minus-state');
+            removeMinusVisual(div);
+            removeMinusCheckbox(cb);
             updateProgressBar();
             return;
           }
 
-          state.comment = commentText.trim();
+          state.comment=commentText.trim();
           setTaskMinus(idx,true);
           setTaskChecked(idx,false);
 
           div.classList.add('minus-state');
           div.classList.remove('done');
+          applyMinusVisual(div);
+          applyMinusCheckbox(cb);
 
-          if (div.parentElement === completedContainer) {
-            insertInOrder(div, itemsContainer, parseInt(div.dataset.originalIndex,10));
+          if(div.parentElement===completedContainer){
+            insertInOrder(div,itemsContainer,parseInt(div.dataset.originalIndex,10));
             updateCompletedSummary();
           }
 
@@ -966,20 +772,24 @@
           return;
         }
 
-        const checked = !!e.target.checked;
-        setTaskChecked(idx, checked);
+        const checked=!!e.target.checked;
+        setTaskChecked(idx,checked);
 
-        if (checked) div.classList.remove('minus-state');
+        if(checked){
+          div.classList.remove('minus-state');
+          removeMinusVisual(div);
+          removeMinusCheckbox(cb);
+        }
 
         if(checked){
           div.classList.add('done');
-          setTimeout(() => {
+          setTimeout(()=>{
             completedContainer.appendChild(div);
             updateCompletedSummary();
-          }, 250);
-        } else {
+          },250);
+        }else{
           div.classList.remove('done');
-          insertInOrder(div, itemsContainer, parseInt(div.dataset.originalIndex,10));
+          insertInOrder(div,itemsContainer,parseInt(div.dataset.originalIndex,10));
           updateCompletedSummary();
         }
         updateProgressBar();
@@ -989,7 +799,6 @@
     function renderChecklist(name){
       currentChecklistName=name;
       taskStateMap={};
-
       chkTitle.textContent=name;
       chkMeta.textContent=`Arbejdsnummer: ${homeWorkNr.value||''} · Dato: ${homeDate.value||''}`;
       itemsContainer.innerHTML='';
@@ -1002,13 +811,12 @@
       let taskIndex=0;
 
       items.forEach((t,i)=>{
+        const text=t.trim();
         const div=document.createElement('div');
-        const originalText=t.trim();
-        let displayText=originalText;
-
+        let displayText=text;
         div.dataset.originalIndex=i;
 
-        if (isNote(originalText)) {
+        if(isNote(text)){
           div.className='item note';
           const lbl=document.createElement('label');
           lbl.textContent=displayText;
@@ -1016,8 +824,7 @@
           itemsContainer.appendChild(div);
           return;
         }
-
-        if (isHeading(originalText)) {
+        if(isHeading(text)){
           div.className='item heading';
           if(displayText.endsWith('.')) displayText=displayText.slice(0,-1);
           const lbl=document.createElement('label');
@@ -1029,9 +836,7 @@
 
         div.className='item task';
         div.dataset.taskIndex=taskIndex++;
-
-        const idx = parseInt(div.dataset.taskIndex,10);
-        initTaskState(idx);
+        initTaskState(taskIndex-1);
 
         const cb=document.createElement('input');
         cb.type='checkbox';
@@ -1043,35 +848,28 @@
 
         div.appendChild(cb);
         div.appendChild(lbl);
-
-        attachCheckboxLogic(cb, div);
+        attachCheckboxLogic(cb,div);
         itemsContainer.appendChild(div);
       });
 
       updateCompletedSummary();
       updateProgressBar();
+      adjustProgressTop();
     }
 
-    function insertInOrder(element, container, originalIndex){
-      const containerItems=Array.from(container.children)
-        .filter(el => typeof el.dataset.originalIndex !== 'undefined');
-      let nextElement=null;
-      for(const item of containerItems){
-        const itemIndex=parseInt(item.dataset.originalIndex,10);
-        if(itemIndex>originalIndex){
-          nextElement=item;
-          break;
-        }
+    function insertInOrder(element,container,originalIndex){
+      const items=Array.from(container.children).filter(el=>typeof el.dataset.originalIndex!=='undefined');
+      let next=null;
+      for(const item of items){
+        const idx=parseInt(item.dataset.originalIndex,10);
+        if(idx>originalIndex){ next=item; break; }
       }
-      if(nextElement){
-        container.insertBefore(element,nextElement);
-      } else {
-        container.appendChild(element);
-      }
+      if(next) container.insertBefore(element,next);
+      else container.appendChild(element);
     }
 
     btnClearAll.addEventListener('click',()=>{
-      if(!currentChecklistName)return;
+      if(!currentChecklistName) return;
       if(!confirm('Er du sikker på, at du vil fjerne alle markeringer?'))return;
       const allTaskCheckboxes=document.querySelectorAll('.item.task input[type="checkbox"]');
       allTaskCheckboxes.forEach(cb=>{
@@ -1080,11 +878,12 @@
           cb.dispatchEvent(new Event('change'));
         }
       });
-      Object.keys(taskStateMap).forEach(k=>{
-        taskStateMap[k].minus=false;
-      });
+      Object.keys(taskStateMap).forEach(k=>{ taskStateMap[k].minus=false; });
       document.querySelectorAll('.item.task').forEach(div=>{
         div.classList.remove('minus-state');
+        removeMinusVisual(div);
+        const cb=div.querySelector('input[type="checkbox"]');
+        if(cb) removeMinusCheckbox(cb);
       });
       updateProgressBar();
     });
@@ -1101,206 +900,60 @@
       for(let i=0;i<items.length;i++){
         const itemText=items[i];
         if(isTask(itemText)){
-          const state = taskStateMap[taskIndex] || { checked:false, minus:false, comment:'' };
-          let mark;
-          if (state.minus) {
-            mark = '[-]';
-          } else if (state.checked) {
-            mark = '[x]';
-          } else {
-            mark = '[ ]';
-          }
-
+          const state=taskStateMap[taskIndex] || {checked:false,minus:false,comment:''};
+          let mark='[ ]';
+          if(state.minus) mark='[-]';
+          else if(state.checked) mark='[x]';
           body+=`${mark} ${itemText}\n`;
-          if (state.minus && state.comment) {
+          if(state.minus && state.comment){
             body+=`    Kommentar: ${state.comment}\n`;
           }
           taskIndex++;
-        } else if(isHeading(itemText)){
+        }else if(isHeading(itemText)){
           body+=`\n*** ${itemText.replace(/\.$/,'').toUpperCase()} ***\n`;
-        } else if(isNote(itemText)){
+        }else if(isNote(itemText)){
           body+=`(${itemText})\n`;
         }
       }
 
       body+=`\nKommentar (generel):\n${comment.value||''}\n\nDato: ${homeDate.value||''}\n`;
-      const r1=localStorage.getItem(STORAGE_KEYS.recipient1)||rec1.value||'';
-      const r2=localStorage.getItem(STORAGE_KEYS.recipient2)||rec2.value||'';
+      const r1=localStorage.getItem(STORAGE_KEYS.recipient1)||'';
+      const r2=localStorage.getItem(STORAGE_KEYS.recipient2)||'';
       const recs=[r1,r2].filter(x=>x&&x.trim());
-
       if(recs.length===0){
         if(!confirm('Ingen modtagere angivet. Fortsæt uden modtagere?'))return;
       }
-
       window.location.href=`mailto:${recs.join(',')}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
       alert('Checkliste er overført til din mailklient – husk at trykke Send.');
     }
     btnSend.addEventListener('click',buildAndSend);
 
-    homeWorkNr.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
+    homeWorkNr.addEventListener('keydown',e=>{
+      if(e.key==='Enter'){
         e.preventDefault();
         btnStart.click();
       }
     });
 
-    btnMinusMode.addEventListener('click', () => {
-      minusModeActive = !minusModeActive;
-      if (minusModeActive) {
+    btnMinusMode.addEventListener('click',()=>{
+      minusModeActive=!minusModeActive;
+      if(minusModeActive){
         btnMinusMode.classList.add('active');
-        minusHintText.textContent = 'Minus er aktiv: klik på én opgave for at markere minus (kræver kommentar).';
-      } else {
+        minusHintText.textContent='Minus er aktiv: klik på én opgave for at markere minus (kræver kommentar).';
+      }else{
         btnMinusMode.classList.remove('active');
-        minusHintText.textContent = 'Aktiver for at markere én opgave som minus (kræver kommentar).';
-      }
-    });
-
-    btnOpenSettings.addEventListener('click',()=>{
-      loadRecipients();
-      const currentTheme = document.body.classList.contains('dark') ? 'dark' : 'light';
-      themeSelect.value = currentTheme;
-      applyLockStateUI();
-      show(modalSettings,'flex');
-      modalSettings.setAttribute('aria-hidden','false');
-    });
-
-    function closeSettings(){
-      saveRecipients();
-      hide(modalSettings);
-      modalSettings.setAttribute('aria-hidden','true');
-    }
-    btnCloseSettings.addEventListener('click',closeSettings);
-    btnCloseAlt.addEventListener('click',closeSettings);
-
-    function saveRecipients(){
-      localStorage.setItem(STORAGE_KEYS.recipient1,rec1.value||'');
-      localStorage.setItem(STORAGE_KEYS.recipient2,rec2.value||'');
-    }
-    function loadRecipients(){
-      rec1.value=localStorage.getItem(STORAGE_KEYS.recipient1)||'';
-      rec2.value=localStorage.getItem(STORAGE_KEYS.recipient2)||'';
-    }
-
-    function applyTheme(theme){
-      if(theme === 'dark'){
-        document.body.classList.add('dark');
-      } else {
-        document.body.classList.remove('dark');
-      }
-      localStorage.setItem(STORAGE_KEYS.theme, theme);
-      if(themeSelect) themeSelect.value = theme;
-    }
-
-    const storedTheme = localStorage.getItem(STORAGE_KEYS.theme) || 'light';
-    applyTheme(storedTheme);
-
-    if(themeSelect){
-      themeSelect.addEventListener('change', () => {
-        applyTheme(themeSelect.value);
-      });
-    }
-
-    function getLockState(){
-      return localStorage.getItem(STORAGE_KEYS.lockState) || 'unlocked';
-    }
-    function setLockState(state){
-      localStorage.setItem(STORAGE_KEYS.lockState, state);
-    }
-    function getStoredPin(){
-      return localStorage.getItem(STORAGE_KEYS.lockPin) || '';
-    }
-    function setStoredPin(pin){
-      localStorage.setItem(STORAGE_KEYS.lockPin, pin);
-    }
-
-    function updateLockButtonLabel() {
-      const state = getLockState();
-      if (state === 'locked') {
-        btnToggleLock.textContent = 'Låst';
-        btnToggleLock.classList.add('lock-locked');
-        btnToggleLock.classList.remove('lock-unlocked');
-      } else {
-        btnToggleLock.textContent = 'Oplåst';
-        btnToggleLock.classList.add('lock-unlocked');
-        btnToggleLock.classList.remove('lock-locked');
-      }
-    }
-
-    function applyLockStateUI(){
-      const state = getLockState();
-      if (state === 'locked') {
-        rec1.disabled = true;
-        rec2.disabled = true;
-        lockStatus.textContent = 'Modtagere er låst. Kun med PIN kan de ændres.';
-      } else {
-        rec1.disabled = false;
-        rec2.disabled = false;
-        lockStatus.textContent = 'Modtagere er ulåst. De kan ændres.';
-      }
-      updateLockButtonLabel();
-    }
-
-    function promptForPin(message){
-      let pin = prompt(message);
-      if (pin === null) return null;
-      pin = pin.trim();
-      if (!/^\d{4}$/.test(pin)) {
-        alert('PIN skal være 4 cifre.');
-        return null;
-      }
-      return pin;
-    }
-
-    btnToggleLock.addEventListener('click', () => {
-      const currentState = getLockState();
-      const currentPin = getStoredPin();
-
-      if (currentState === 'unlocked') {
-        let pin = currentPin;
-        if (!pin) {
-          pin = promptForPin('Indtast ny 4-cifret PIN til at låse modtagere:');
-          if (!pin) return;
-          setStoredPin(pin);
-          alert('PIN er sat. Brug den samme PIN for at låse op.');
-        } else {
-          const entered = promptForPin('Indtast PIN for at låse modtagere:');
-          if (!entered) return;
-          if (entered !== currentPin) {
-            alert('Forkert PIN. Modtagere forbliver ulåst.');
-            return;
-          }
-        }
-        setLockState('locked');
-        applyLockStateUI();
-      } else {
-        if (!currentPin) {
-          alert('Ingen PIN er sat. Kan ikke låse op på sikker vis.');
-          return;
-        }
-        const entered = promptForPin('Indtast PIN for at låse modtagere op:');
-        if (!entered) return;
-        if (entered !== currentPin) {
-          alert('Forkert PIN. Modtagere forbliver låst.';
-          return;
-        }
-        setLockState('unlocked');
-        applyLockStateUI();
+        minusHintText.textContent='Aktiver for at markere én opgave som minus (kræver kommentar).';
       }
     });
 
     btnStart.addEventListener('click',()=>{
-      hide(workHelp);
-      hide(workRequired);
-
+      hide(workHelp);hide(workRequired);
       if(!homeWorkNr.value||homeWorkNr.value.trim()===''){
-        show(workRequired);
-        return;
+        show(workRequired);return;
       }
       if(!/^\d{5}$/.test(homeWorkNr.value||'')){
-        show(workHelp);
-        return;
+        show(workHelp);return;
       }
-
       renderChecklist(homeChecklistSelect.value);
       hide(pageHome);
       show(pageChecklist);
@@ -1318,32 +971,29 @@
       hide(progressHint);
       hide(minusToggleBar);
       currentChecklistName=null;
-      minusModeActive = false;
+      minusModeActive=false;
       btnMinusMode.classList.remove('active');
-      minusHintText.textContent = 'Aktiver for at markere én opgave som minus (kræver kommentar).';
+      minusHintText.textContent='Aktiver for at markere én opgave som minus (kræver kommentar).';
       if(progressTrack) progressTrack.setAttribute('aria-valuenow','0');
-      pageChecklist.style.marginTop = '8px';
       window.scrollTo(0,0);
     });
 
     homeWorkNr.addEventListener('input',()=>{
-      hide(workHelp);
-      hide(workRequired);
+      hide(workHelp);hide(workRequired);
       homeWorkNr.value=(homeWorkNr.value||'').replace(/[^\d]/g,'').slice(0,5);
     });
 
     function setTodayDate(){
-      const d = new Date();
-      const year = d.getFullYear();
-      const month = String(d.getMonth()+1).padStart(2,'0');
-      const day = String(d.getDate()).padStart(2,'0');
-      homeDate.value = `${year}-${month}-${day}`;
+      const d=new Date();
+      const y=d.getFullYear();
+      const m=String(d.getMonth()+1).padStart(2,'0');
+      const day=String(d.getDate()).padStart(2,'0');
+      homeDate.value=`${y}-${m}-${day}`;
     }
 
     (function init(){
       try{
         setTodayDate();
-
         homeChecklistSelect.innerHTML='';
         Object.keys(checklists).forEach(k=>{
           const o=document.createElement('option');
@@ -1351,9 +1001,6 @@
           o.textContent=k;
           homeChecklistSelect.appendChild(o);
         });
-
-        loadRecipients();
-        applyLockStateUI();
         adjustProgressTop();
         hide(progressWrapper);
         hide(workHelp);
