@@ -246,7 +246,7 @@
     button.ghost{
       background:#fff;
       color:var(--rock-red);
-      border:1px solid(var(--rock-red));
+      border:1px solid var(--rock-red);
     }
     body.dark button{
       background:#b3001f;
@@ -436,6 +436,11 @@
       border-color:#15803d;
     }
 
+    /* Lidt baseline-margin på checklist-siden */
+    #page-checklist{
+      margin-top:8px;
+    }
+
     /* MOBIL-TILPASNINGER */
     @media (max-width: 480px) {
       body {
@@ -610,8 +615,8 @@
       recipient1: 'rg_rec1',
       recipient2: 'rg_rec2',
       theme:      'checklister_theme',
-      lockState:  'checklister_lock_state',  // 'locked' | 'unlocked'
-      lockPin:    'checklister_lock_pin'     // gemt PIN (simpel)
+      lockState:  'checklister_lock_state',
+      lockPin:    'checklister_lock_pin'
     };
 
     const headerEl=document.getElementById('mainHeader')||document.querySelector('header');
@@ -778,7 +783,6 @@
     };
 
     let currentChecklistName=null;
-    // pr. taskIndex: { checked:boolean, minus:boolean, comment:string }
     let taskStateMap = {};
     let minusModeActive = false;
 
@@ -792,7 +796,18 @@
     }
 
     function adjustProgressTop(){
-      progressWrapper.style.top=(headerEl.offsetHeight)+'px';
+      const headerHeight = headerEl.offsetHeight;
+      progressWrapper.style.top = headerHeight + 'px';
+
+      const isChecklistVisible = pageChecklist.style.display !== 'none';
+      const isProgressVisible = progressWrapper.style.display !== 'none';
+
+      if (isChecklistVisible && isProgressVisible) {
+        const pwHeight = progressWrapper.offsetHeight || 40;
+        pageChecklist.style.marginTop = (pwHeight + 8) + 'px';
+      } else {
+        pageChecklist.style.marginTop = '8px';
+      }
     }
     window.addEventListener('resize',adjustProgressTop);
 
@@ -840,7 +855,7 @@
       }
     }
 
-    // VIGTIGT: Tæl færdige opgaver via DOM
+    // Tæl færdige opgaver via DOM (checkbox + minus-state)
     function getTaskCountsFromDom(){
       const allTasks = document.querySelectorAll('.item.task');
       const totalTasks = allTasks.length;
@@ -903,6 +918,7 @@
       show(progressWrapper,'flex');
       show(minusToggleBar,'flex');
       checkAllAndShowSend();
+      adjustProgressTop();
     }
 
     function checkAllAndShowSend(){
@@ -1038,7 +1054,6 @@
 
       updateCompletedSummary();
       updateProgressBar();
-      adjustProgressTop();
     }
 
     function insertInOrder(element, container, originalIndex){
@@ -1317,6 +1332,7 @@
       btnMinusMode.classList.remove('active');
       minusHintText.textContent = 'Aktiver for at markere én opgave som minus (kræver kommentar).';
       if(progressTrack) progressTrack.setAttribute('aria-valuenow','0');
+      pageChecklist.style.marginTop = '8px';
       window.scrollTo(0,0);
     });
 
