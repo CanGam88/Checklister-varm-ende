@@ -560,7 +560,7 @@
         <button id="btnSend" style="display:none;flex-grow:1;">Send</button>
       </div>
 
-      <div class="meta small" style="margin-top:8px">Tryk Send når alle punkter er afkrydset for at sende checklisten.</div>
+      <div class="meta small" style="margin-top:8px">Tryk Send når alle punkter er afkrydset eller markeret minus for at sende checklisten.</div>
     </section>
 
     <div id="modalSettings" class="modal" style="display:none" aria-hidden="true">
@@ -838,14 +838,18 @@
       }
     }
 
+    // NY: Tæl udførte opgaver via taskStateMap, så både checked og minus tæller
     function getTaskCountsFromDom(){
-      const cbsInMain=itemsContainer.querySelectorAll('.item.task input[type="checkbox"]');
-      const cbsInCompleted=completedContainer.querySelectorAll('.item.task input[type="checkbox"]');
-      const totalTasks=cbsInMain.length + cbsInCompleted.length;
-      let checkedTasks=0;
-      cbsInMain.forEach(cb=>{ if(cb.checked) checkedTasks++; });
-      cbsInCompleted.forEach(cb=>{ if(cb.checked) checkedTasks++; });
-      return { totalTasks, checkedTasks };
+      let totalTasks = Object.keys(taskStateMap).length;
+      let doneTasks = 0;
+
+      Object.values(taskStateMap).forEach(state => {
+        if (state.checked || state.minus) {
+          doneTasks++;
+        }
+      });
+
+      return { totalTasks, checkedTasks: doneTasks };
     }
 
     function updateCompletedSummary() {
@@ -863,7 +867,9 @@
         hide(progressWrapper);
         return;
       }
+
       const { totalTasks, checkedTasks } = getTaskCountsFromDom();
+
       if(!totalTasks){
         hide(progressWrapper);
         progressText.textContent='0% · 0/0';
@@ -872,6 +878,7 @@
         if(progressTrack) progressTrack.setAttribute('aria-valuenow','0');
         return;
       }
+
       const pct=Math.round((checkedTasks/totalTasks)*100);
       const remaining = totalTasks - checkedTasks;
 
@@ -880,9 +887,9 @@
       progressText.textContent=`${pct}% · ${checkedTasks}/${totalTasks}`;
 
       if(remaining > 0){
-        progressHint.textContent = `Du mangler ${remaining} opgave${remaining === 1 ? '' : 'r'}`;
+        progressHint.textContent = `Du mangler ${remaining} opgave${remaining === 1 ? '' : 'r'} (inkl. evt. minus-opgaver)`;
       } else {
-        progressHint.textContent = 'Alle opgaver er udført – klar til at sende';
+        progressHint.textContent = 'Alle opgaver er udført eller markeret minus – klar til at sende';
       }
       show(progressHint);
 
@@ -1062,6 +1069,7 @@
       document.querySelectorAll('.item.task').forEach(div=>{
         div.classList.remove('minus-state');
       });
+      updateProgressBar();
     });
 
     function buildAndSend(){
