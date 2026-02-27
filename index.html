@@ -11,120 +11,160 @@
       --note-bg:#FFFDE7; --note-color:#757575; --minus-red:#b91c1c;
       --minus-bg:#fee2e2; --minus-border:#dc2626;
     }
-    html,body{ margin:0; font-family:system-ui,Arial; background-color:var(--bg); color:var(--text); }
-    header{ background:var(--rock-red); color:#fff; padding:14px; position:sticky; top:0; z-index:1000; }
-    #progressWrapper{ position:fixed; left:0; right:0; top:50px; display:none; align-items:center; padding:10px; z-index:1200; background:rgba(255,255,255,0.95); border-bottom:1px solid #e5e7eb; flex-direction:column; }
+    /* Dark Mode farver */
+    body.dark {
+      --bg:#0f172a; --card:#1f2933; --text:#f9fafb; --muted:#9ca3af;
+      --heading-bg:#1e293b; --heading-color:#e2e8f0; --note-bg:#1e1b4b;
+    }
+
+    html,body{ margin:0; font-family:system-ui,Arial; background-color:var(--bg); color:var(--text); transition: background 0.3s; }
+    header{ background:var(--rock-red); color:#fff; padding:14px; position:sticky; top:0; z-index:1000; display:flex; justify-content:space-between; align-items:center; }
+    #progressWrapper{ position:fixed; left:0; right:0; top:50px; display:none; align-items:center; padding:10px; z-index:1200; background:var(--card); border-bottom:1px solid var(--muted); flex-direction:column; }
     .progress-track{ width:80%; height:12px; background:#e5e7eb; border-radius:10px; overflow:hidden; margin: 5px 0; }
     .progress-fill{ height:100%; width:0%; background:var(--rock-red); transition: width .3s; }
     main{ max-width:900px; margin:20px auto; padding:0 15px; }
     .card{ background:var(--card); border-radius:8px; padding:15px; box-shadow:0 2px 5px rgba(0,0,0,0.1); margin-bottom:20px; }
     .item{ display:flex; gap:10px; padding:12px; border-bottom:1px solid #eee; align-items: flex-start; }
-    .item.task input[type="checkbox"]{ width:22px; height:22px; flex-shrink:0; cursor:pointer; }
-    .item.heading{ background:var(--heading-bg); color:var(--heading-color); font-weight:700; border-left:5px solid var(--heading-color); }
-    .item.note{ background:var(--note-bg); font-style:italic; border-left:5px solid #FFC107; }
-    .done label{ text-decoration: line-through; opacity: 0.5; color: var(--rock-red); }
+    .done label{ text-decoration: line-through; opacity: 0.5; }
     .minus-state label{ color: var(--minus-red); text-decoration: underline; font-weight: bold; }
     button{ background:var(--rock-red); color:#fff; border:none; padding:10px 20px; border-radius:6px; cursor:pointer; font-weight:700; }
     button.ghost{ background:none; border:1px solid var(--rock-red); color:var(--rock-red); }
-    #btnMinusMode.active { background: var(--minus-red); color: white; }
-    textarea{ width:100%; min-height:80px; margin-top:10px; border-radius:6px; border:1px solid #ccc; padding:10px; box-sizing: border-box; }
-    .helper{ color:var(--minus-red); font-size:13px; margin-top:5px; }
+    
+    /* Modal / Indstillinger */
+    #settingsModal {
+      display:none; position:fixed; top:0; left:0; width:100%; height:100%; 
+      background:rgba(0,0,0,0.7); z-index:2000; justify-content:center; align-items:center;
+    }
+    .modal-content { background:var(--card); padding:20px; border-radius:8px; width:90%; max-width:400px; }
+    input { width:100%; padding:10px; margin:5px 0 15px; border-radius:6px; border:1px solid #ccc; box-sizing:border-box; background:inherit; color:inherit; }
   </style>
 </head>
 <body>
 
-<header id="mainHeader">
-  <div style="display:flex;justify-content:space-between;align-items:center">
-    <h1>Checklister</h1>
+<header>
+  <div style="display:flex; gap:10px; align-items:center;">
+    <h1 style="margin:0; font-size:20px;">Checklister</h1>
+  </div>
+  <div style="display:flex; gap:15px; align-items:center;">
+    <button onclick="toggleTheme()" style="background:none; font-size:20px; padding:0;">🌓</button>
+    <button id="btnOpenSettings" style="background:none; font-size:20px; padding:0;">⚙️</button>
     <div style="font-weight:700;">ROCKWOOL</div>
   </div>
 </header>
 
+<div id="settingsModal">
+  <div class="modal-content">
+    <h3>Indstillinger</h3>
+    <div id="unlockSection">
+      <label>Indtast PIN for at rette (Standard: 1234)</label>
+      <input type="password" id="settingsPin" placeholder="PIN-kode">
+      <button onclick="unlockSettings()" style="width:100%">Lås op</button>
+    </div>
+    <div id="configSection" style="display:none;">
+      <label>Email Modtager 1</label>
+      <input type="email" id="email1" placeholder="email@domæne.dk">
+      <label>Email Modtager 2</label>
+      <input type="email" id="email2" placeholder="email@domæne.dk">
+      <button onclick="saveSettings()" style="width:100%">Gem & Luk</button>
+    </div>
+    <button onclick="closeSettings()" class="ghost" style="width:100%; margin-top:10px;">Annuller</button>
+  </div>
+</div>
+
 <div id="progressWrapper">
   <div class="progress-track"><div id="progressFill" class="progress-fill"></div></div>
   <div id="progressText" style="font-size:12px; font-weight:700;">0% · 0/0</div>
-  <div id="minusToggleBar" style="display:flex; align-items:center; gap:10px; margin-top:5px;">
-    <button id="btnMinusMode" type="button" class="ghost">Minus til næste opgave</button>
-    <span style="font-size:11px; color:var(--muted)">Aktivér for at markere én fejl/minus</span>
+  <div style="display:flex; gap:10px; margin-top:5px;">
+    <button id="btnMinusMode" type="button" class="ghost" style="font-size:12px;">Minus til næste opgave</button>
   </div>
 </div>
 
 <main>
   <section id="page-home" class="card">
-    <div style="font-weight:800; margin-bottom:15px;">Vælg liste og indtast arbejdsnummer</div>
     <label>Vælg liste</label>
-    <select id="homeChecklistSelect"></select>
+    <select id="homeChecklistSelect" style="width:100%; padding:10px; margin-bottom:15px; border-radius:6px;"></select>
     
-    <div style="margin-top:15px;">
-      <label>Arbejdsnummer (5 cifre)</label>
-      <input id="homeWorkNr" type="text" maxlength="5" placeholder="fx 01234" style="width:100%; padding:10px; margin-top:5px;">
-      <div id="workHelp" class="helper" style="display:none">Skal være 5 cifre.</div>
-    </div>
+    <label>Arbejdsnummer (5 cifre)</label>
+    <input id="homeWorkNr" type="text" maxlength="5" placeholder="fx 01234">
+    <div id="workHelp" class="helper" style="display:none">Skal være 5 cifre.</div>
 
-    <div style="margin-top:15px;">
-      <label>Dato</label>
-      <input id="homeDate" type="date" readonly style="width:100%; padding:10px; background:#eee;">
-    </div>
+    <label>Dato</label>
+    <input id="homeDate" type="date" readonly style="background:#eee; color:#666;">
     
     <button id="btnStart" style="width:100%; margin-top:20px;">Start Checklist</button>
   </section>
 
   <section id="page-checklist" class="card" style="display:none">
-    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-      <div>
-        <div id="chkTitle" style="font-weight:800; font-size:18px;"></div>
-        <div id="chkMeta" style="font-size:12px; color:var(--muted)"></div>
-      </div>
+    <div style="display:flex; justify-content:space-between;">
+      <div id="chkTitle" style="font-weight:800; font-size:18px;"></div>
       <button id="btnBack" class="ghost">Tilbage</button>
     </div>
-
     <div id="itemsContainer" style="margin-top:20px;"></div>
-
-    <details id="completedSection" style="margin-top:20px; border-top:1px dashed #ccc;">
-      <summary id="completedSummary" style="padding:10px; cursor:pointer; font-weight:700;">Udførte opgaver (0)</summary>
-      <div id="completedContainer"></div>
-    </details>
-
-    <div style="margin-top:20px;">
-      <label>Generel kommentar (valgfri)</label>
-      <textarea id="comment"></textarea>
-    </div>
-
-    <div style="margin-top:15px; display:flex; gap:10px;">
-      <button id="btnClearAll" class="ghost">Nulstil</button>
-      <button id="btnSend" style="flex-grow:1; display:none;">Send Rapport</button>
-    </div>
+    <details id="completedSection" style="margin-top:20px;"><summary id="completedSummary">Udførte opgaver (0)</summary><div id="completedContainer"></div></details>
+    <textarea id="comment" placeholder="Generel kommentar..."></textarea>
+    <button id="btnSend" style="width:100%; margin-top:15px; display:none;">Send Rapport</button>
   </section>
 </main>
 
 <script>
+    const MASTER_PIN = "1234"; // Skift din PIN her
     const checklists = {
-        "Aquila opstart - Spinder passer": [
-            "Drej nøgle til Energen anlægget ved manuel", "Gennemgå alarmlisten.", "Start kølevandssystemet i Group mode", 
-            "Åben gas og ilt haner i Aquila kølerummet", "Opstart anlæg: Vælg Group mode", "Smeltestart:", "Start DrySoTec anlæget på billede 2135."
-        ],
-        "Opstartsliste Kældermand Aquila L5": [
-            "Før opstart runderes anlægget :", "Inspicer Smeltecyklon + Cyklon 1 + Cyklon 2", "Luk lågen på cykloner 1 og 2", "Tappelanser er klargjort.", "Køling af sifon og bakker er åbnet."
-        ],
-        "Kældermand rundgang": [
-            "Tromlerens:", "Kontroller at dyserne sprøjter korrekt", "Fjern opbygninger omkring forspaltevalse", "Pumperum:", "Kontroller at filtre i dagtanken ikke er stoppede"
-        ]
+        "Aquila opstart - Spinder passer": ["Drej nøgle til Energen", "Gennemgå alarmlisten", "Start kølevandssystemet"],
+        "Opstartsliste Kældermand Aquila L5": ["Før opstart runderes anlægget", "Inspicer Smeltecyklon", "Luk lågen på cykloner"],
+        "Kældermand rundgang": ["Tromlerens:", "Kontroller dyser", "Pumperum:", "Tjek filtre"]
     };
 
-    const state = { minusMode: false, currentTasks: [] };
+    // --- DARK MODE LOGIK ---
+    function toggleTheme() {
+        document.body.classList.toggle('dark');
+        localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
+    }
+    if(localStorage.getItem('theme') === 'dark') document.body.classList.add('dark');
 
-    // Initialisering
+    // --- INDSTILLINGER LOGIK ---
+    const modal = document.getElementById('settingsModal');
+    document.getElementById('btnOpenSettings').onclick = () => {
+        modal.style.display = 'flex';
+        document.getElementById('unlockSection').style.display = 'block';
+        document.getElementById('configSection').style.display = 'none';
+        document.getElementById('settingsPin').value = '';
+    };
+
+    function unlockSettings() {
+        if(document.getElementById('settingsPin').value === MASTER_PIN) {
+            document.getElementById('unlockSection').style.display = 'none';
+            document.getElementById('configSection').style.display = 'block';
+            document.getElementById('email1').value = localStorage.getItem('email1') || "";
+            document.getElementById('email2').value = localStorage.getItem('email2') || "";
+        } else {
+            alert("Forkert PIN!");
+        }
+    }
+
+    function saveSettings() {
+        localStorage.setItem('email1', document.getElementById('email1').value);
+        localStorage.setItem('email2', document.getElementById('email2').value);
+        closeSettings();
+    }
+
+    function closeSettings() { modal.style.display = 'none'; }
+
+    // --- APP LOGIK ---
     document.getElementById('homeDate').valueAsDate = new Date();
     const sel = document.getElementById('homeChecklistSelect');
-    Object.keys(checklists).forEach(key => {
-        const opt = document.createElement('option');
-        opt.value = key; opt.textContent = key;
-        sel.appendChild(opt);
+    Object.keys(checklists).forEach(k => {
+        const o = document.createElement('option'); o.value = k; o.innerText = k; sel.appendChild(o);
     });
 
+    let minusActive = false;
+    document.getElementById('btnMinusMode').onclick = function() {
+        minusActive = !minusActive;
+        this.style.background = minusActive ? "var(--minus-red)" : "";
+        this.style.color = minusActive ? "white" : "";
+    };
+
     document.getElementById('btnStart').onclick = () => {
-        const nr = document.getElementById('homeWorkNr').value;
-        if(nr.length !== 5) {
+        if(document.getElementById('homeWorkNr').value.length !== 5) {
             document.getElementById('workHelp').style.display = 'block';
             return;
         }
@@ -134,105 +174,69 @@
         render(sel.value);
     };
 
-    document.getElementById('btnBack').onclick = () => location.reload();
-
-    document.getElementById('btnMinusMode').onclick = function() {
-        state.minusMode = !state.minusMode;
-        this.classList.toggle('active', state.minusMode);
-    };
-
     function render(name) {
         const container = document.getElementById('itemsContainer');
-        const meta = document.getElementById('chkMeta');
-        document.getElementById('chkTitle').textContent = name;
-        meta.textContent = `Arbejdsnr: ${document.getElementById('homeWorkNr').value} | Dato: ${document.getElementById('homeDate').value}`;
-        
+        document.getElementById('chkTitle').innerText = name;
         container.innerHTML = '';
-        checklists[name].forEach((text, index) => {
+        checklists[name].forEach((t, i) => {
             const div = document.createElement('div');
-            div.className = 'item';
-            div.dataset.index = index;
-
-            if(text.endsWith(':')) {
-                div.classList.add('heading');
-                div.innerHTML = `<label>${text}</label>`;
+            div.className = 'item task';
+            div.dataset.index = i;
+            if(t.endsWith(':')) {
+                div.innerHTML = `<label style="font-weight:800; color:var(--rock-red)">${t}</label>`;
             } else {
-                div.classList.add('task');
-                const cb = document.createElement('input');
-                cb.type = 'checkbox';
-                const lbl = document.createElement('label');
-                lbl.textContent = text;
-                
-                cb.onchange = () => handleToggle(cb, div);
-                div.append(cb, lbl);
+                const cb = document.createElement('input'); cb.type = 'checkbox';
+                cb.onchange = () => {
+                    if(minusActive && cb.checked) {
+                        const r = prompt("Årsag til minus:");
+                        if(!r) { cb.checked = false; return; }
+                        div.classList.add('minus-state'); div.dataset.reason = r;
+                        minusActive = false; document.getElementById('btnMinusMode').style = "";
+                    }
+                    if(cb.checked) {
+                        div.classList.add('done');
+                        setTimeout(() => { document.getElementById('completedContainer').appendChild(div); updateUI(); }, 200);
+                    } else {
+                        div.classList.remove('done', 'minus-state');
+                        const items = document.getElementById('itemsContainer');
+                        const children = Array.from(items.children);
+                        const next = children.find(c => parseInt(c.dataset.index) > i);
+                        next ? items.insertBefore(div, next) : items.appendChild(div);
+                    }
+                    updateUI();
+                };
+                div.append(cb, Object.assign(document.createElement('label'), {innerText: t}));
             }
             container.appendChild(div);
         });
         updateUI();
     }
 
-    function handleToggle(cb, div) {
-        if(state.minusMode && cb.checked) {
-            const reason = prompt("Angiv årsag til minus-markering:");
-            if(!reason) { cb.checked = false; return; }
-            div.classList.add('minus-state');
-            div.dataset.reason = reason;
-            state.minusMode = false;
-            document.getElementById('btnMinusMode').classList.remove('active');
-        } else if (!cb.checked) {
-            div.classList.remove('minus-state', 'done');
-            delete div.dataset.reason;
-        }
-
-        if(cb.checked) {
-            div.classList.add('done');
-            setTimeout(() => {
-                document.getElementById('completedContainer').appendChild(div);
-                updateUI();
-            }, 300);
-        } else {
-            const items = document.getElementById('itemsContainer');
-            insertInOrder(div, items);
-            updateUI();
-        }
-    }
-
-    function insertInOrder(el, container) {
-        const idx = parseInt(el.dataset.index);
-        const children = Array.from(container.children);
-        const next = children.find(c => parseInt(c.dataset.index) > idx);
-        next ? container.insertBefore(el, next) : container.appendChild(el);
-    }
-
     function updateUI() {
-        const tasks = document.querySelectorAll('.item.task');
-        const completed = document.querySelectorAll('.item.task.done').length + document.querySelectorAll('.item.task.minus-state').length;
-        const total = tasks.length;
-        const pct = total ? Math.round((completed/total)*100) : 0;
-
+        const total = document.querySelectorAll('.item.task').length;
+        const done = document.querySelectorAll('.item.task.done').length;
+        const pct = total ? Math.round((done/total)*100) : 0;
         document.getElementById('progressFill').style.width = pct + '%';
-        document.getElementById('progressText').textContent = `${pct}% · ${completed}/${total}`;
-        document.getElementById('completedSummary').textContent = `Udførte opgaver (${document.getElementById('completedContainer').children.length})`;
-        document.getElementById('btnSend').style.display = (completed === total && total > 0) ? 'block' : 'none';
-        document.getElementById('completedSection').style.display = document.getElementById('completedContainer').children.length ? 'block' : 'none';
+        document.getElementById('progressText').innerText = `${pct}% · ${done}/${total}`;
+        document.getElementById('btnSend').style.display = (done === total && total > 0) ? 'block' : 'none';
+        document.getElementById('completedSummary').innerText = `Udførte opgaver (${document.getElementById('completedContainer').children.length})`;
     }
 
     document.getElementById('btnSend').onclick = () => {
-        let report = `Checkliste: ${document.getElementById('chkTitle').textContent}\n`;
-        report += `Arbejdsnummer: ${document.getElementById('homeWorkNr').value}\n\n`;
+        const e1 = localStorage.getItem('email1') || "";
+        const e2 = localStorage.getItem('email2') || "";
+        const recipients = [e1, e2].filter(e => e).join(',');
         
+        let body = `Checkliste: ${document.getElementById('chkTitle').innerText}\nArbejdsnr: ${document.getElementById('homeWorkNr').value}\n\n`;
         document.querySelectorAll('.minus-state').forEach(el => {
-            report += `[MINUS] ${el.querySelector('label').textContent}: ${el.dataset.reason}\n`;
+            body += `[MINUS] ${el.querySelector('label').innerText}: ${el.dataset.reason}\n`;
         });
+        body += `\nKommentar: ${document.getElementById('comment').value}`;
         
-        report += `\nGenerel kommentar: ${document.getElementById('comment').value}`;
-        
-        const mailto = `mailto:modtager@rockwool.com?subject=Checkliste Fuldført&body=${encodeURIComponent(report)}`;
-        window.location.href = mailto;
+        window.location.href = `mailto:${recipients}?subject=Checkliste Rapport&body=${encodeURIComponent(body)}`;
     };
 
-    document.getElementById('btnClearAll').onclick = () => { if(confirm("Vil du rydde alle markeringer?")) location.reload(); };
+    document.getElementById('btnBack').onclick = () => location.reload();
 </script>
-
 </body>
 </html>
