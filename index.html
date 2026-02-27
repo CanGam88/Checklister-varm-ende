@@ -6,1010 +6,233 @@
   <title>Checklister Varm ende — ROCKWOOL</title>
   <style>
     :root{
-      --rock-red:#E60028;
-      --bg:#f3f4f6;
-      --card:#ffffff;
-      --text:#111111;
-      --muted:#6b7280;
-      --heading-bg:#E8EAF6;
-      --heading-color:#1A237E;
-      --note-bg:#FFFDE7;
-      --note-color:#757575;
-      --minus-red:#b91c1c;
-      --minus-bg:#fee2e2;
-      --minus-border:#dc2626;
+      --rock-red:#E60028; --bg:#f3f4f6; --card:#ffffff; --text:#111111;
+      --muted:#6b7280; --heading-bg:#E8EAF6; --heading-color:#1A237E;
+      --note-bg:#FFFDE7; --note-color:#757575; --minus-red:#b91c1c;
+      --minus-bg:#fee2e2; --minus-border:#dc2626;
     }
-
-    body.dark{
-      --bg:#0f172a;
-      --card:#1f2933;
-      --text:#f9fafb;
-      --muted:#9ca3af;
-      --heading-bg:#0f172a;
-      --heading-color:#e5e7eb;
-      --note-bg:#111827;
-      --note-color:#d1d5db;
-    }
-
-    html,body{
-      margin:0;
-      font-family:system-ui,Roboto,Arial;
-      background-color:var(--bg);
-      color:var(--text);
-    }
-
-    main{
-      max-width:900px;
-      margin:12px auto;
-      padding:18px;
-      background-color:var(--bg);
-    }
-
-    header{
-      background:var(--rock-red);
-      color:#fff;
-      padding:14px;
-      position:sticky;
-      top:0;
-      z-index:1000;
-    }
-    header h1{margin:0;font-size:22px;line-height:1;}
-
-    #progressWrapper{
-      position:fixed;
-      left:0;
-      right:0;
-      top:50px;
-      display:none;
-      align-items:center;
-      justify-content:center;
-      padding:4px 12px 6px;
-      z-index:1200;
-      background:rgba(255,255,255,0.95);
-      border-bottom:1px solid #e5e7eb;
-      flex-direction:column;
-      gap:4px;
-    }
-
-    .progress-track{
-      width:70%;
-      max-width:700px;
-      height:12px;
-      background:#e5e7eb;
-      border-radius:10px;
-      overflow:hidden;
-      position:relative;
-    }
-
-    .progress-fill{
-      height:100%;
-      width:0;
-      background:var(--rock-red);
-      transition:width .3s ease;
-    }
-    .progress-row{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      width:100%;
-      max-width:900px;
-    }
-    .progress-text{
-      font-weight:600;
-      font-size:11px;
-      color:#374151;
-      white-space:nowrap;
-    }
-    #progressHint{
-      font-size:11px;
-      color:#555;
-    }
-
-    #minusToggleBar{
-      display:none;
-      align-items:center;
-      justify-content:center;
-      gap:8px;
-      margin-top:4px;
-    }
-    #btnMinusMode{
-      padding:6px 10px;
-      border-radius:999px;
-      border:1px solid var(--minus-border);
-      background:var(--minus-bg);
-      color:var(--minus-red);
-      font-size:13px;
-      font-weight:600;
-      cursor:pointer;
-    }
-    #btnMinusMode.active{
-      background:var(--minus-red);
-      color:#fff;
-    }
-    #minusHintText{
-      font-size:11px;
-      color:#6b7280;
-    }
-
-    .card{
-      background-color:var(--card);
-      border-radius:8px;
-      padding:12px;
-      margin-bottom:12px;
-      box-shadow:0 1px 4px rgba(0,0,0,.06);
-    }
-
-    label{font-weight:700}
-    input,select,textarea{
-      width:100%;
-      padding:10px;
-      border:1px solid #d4d4d4;
-      border-radius:8px;
-      margin-top:8px;
-      font:inherit;
-      background-color:#ffffff;
-      color:#111827;
-    }
-    textarea{min-height:100px}
-
-    .row{display:flex;gap:10px;flex-wrap:wrap}
-    .col{flex:1;min-width:160px}
-
-    #page-home .row:last-child .col:last-child{
-      min-width:100%;
-      flex:1 1 100%;
-      display:flex;
-      align-items:flex-end;
-    }
-    #page-home #btnStart{width:100%}
-
-    button{
-      background:var(--rock-red);
-      color:#fff;
-      border:0;
-      padding:10px 12px;
-      border-radius:8px;
-      cursor:pointer;
-      font-weight:700;
-    }
-    button.ghost{
-      background:#fff;
-      color:var(--rock-red);
-      border:1px solid var(--rock-red);
-    }
-
-    .small{font-size:13px;color:var(--muted)}
-
-    .list-items{margin-top:12px}
-    .item{
-      display:flex;
-      gap:10px;
-      align-items:flex-start;
-      padding:10px 8px;
-      border-bottom:1px solid #e5e7eb;
-    }
-    .item label{
-      flex:1;
-      line-height:1.4;
-      padding-top:1px;
-      transition:color .2s ease, opacity .2s ease, text-decoration-color .2s ease;
-    }
-
-    .item.task input[type="checkbox"]{
-      width:20px;
-      height:20px;
-      margin-top:2px;
-      flex-shrink:0;
-      border-radius:4px;
-      border:2px solid #cbd5e1;
-      appearance:none;
-      background:#fff;
-      position:relative;
-      cursor:pointer;
-      outline:none;
-      transition:border-color .2s ease, background .2s ease, transform .15s ease;
-    }
-    .item.task input[type="checkbox"]::before{
-      content:'';
-      position:absolute;
-      left:4px;
-      top:3px;
-      width:8px;
-      height:12px;
-      border-right:2px solid #fff;
-      border-bottom:2px solid #fff;
-      transform:rotate(35deg) scale(0);
-      transform-origin:bottom left;
-      transition:transform .2s ease-out;
-    }
-    .item.task input[type="checkbox"]:checked{
-      background:var(--rock-red);
-      border-color:var(--rock-red);
-      transform:scale(1.05);
-    }
-    .item.task input[type="checkbox"]:checked::before{
-      transform:rotate(35deg) scale(1);
-    }
-
-    /* VISUELT MINUS I CHECKBOKSEN */
-    .item.task input[type="checkbox"].minus-checked{
-      background:var(--minus-bg);
-      border-color:var(--minus-red);
-    }
-    .item.task input[type="checkbox"].minus-checked::before{
-      content:'−';
-      position:absolute;
-      left:50%;
-      top:50%;
-      transform:translate(-50%, -55%);
-      width:auto;
-      height:auto;
-      border:none;
-      color:var(--minus-red);
-      font-weight:900;
-      font-size:16px;
-    }
-
-    .done{
-      opacity:.9;
-      color:var(--rock-red);
-      text-decoration:line-through;
-      text-decoration-color:var(--rock-red);
-    }
-
-    .item.task.minus-state label{
-      color:var(--minus-red);
-      text-decoration:underline;
-    }
-
-    .item.heading{
-      background:var(--heading-bg);
-      border-left:5px solid var(--heading-color);
-      margin-top:15px;
-      margin-bottom:5px;
-      padding:10px;
-      border-bottom:none;
-    }
-    .item.heading label{
-      font-weight:700;
-      color:var(--heading-color);
-      font-size:1.05em;
-    }
-
-    .item.note{
-      background:var(--note-bg);
-      border-left:5px solid #FFC107;
-      padding:8px 10px;
-      font-style:italic;
-      margin-top:5px;
-      margin-bottom:5px;
-      border-bottom:none;
-    }
-    .item.note label{
-      color:var(--note-color);
-      font-size:0.95em;
-    }
-
-    .list-items .item:last-child{border-bottom:none}
-
-    details#completedSection{
-      margin-top:12px;
-      border-top:1px dashed #e5e7eb;
-      padding-top:8px;
-    }
-    details#completedSection summary{
-      font-weight:700;
-      cursor:pointer;
-      padding:8px 6px;
-    }
-
-    .helper{font-size:13px;color:#b12727;margin-top:6px}
-    footer{color:var(--muted);text-align:center;margin:20px 0}
-    .btn-small{padding:5px 8px;font-size:12px;border-radius:6px}
+    html,body{ margin:0; font-family:system-ui,Arial; background-color:var(--bg); color:var(--text); }
+    header{ background:var(--rock-red); color:#fff; padding:14px; position:sticky; top:0; z-index:1000; }
+    #progressWrapper{ position:fixed; left:0; right:0; top:50px; display:none; align-items:center; padding:10px; z-index:1200; background:rgba(255,255,255,0.95); border-bottom:1px solid #e5e7eb; flex-direction:column; }
+    .progress-track{ width:80%; height:12px; background:#e5e7eb; border-radius:10px; overflow:hidden; margin: 5px 0; }
+    .progress-fill{ height:100%; width:0%; background:var(--rock-red); transition: width .3s; }
+    main{ max-width:900px; margin:20px auto; padding:0 15px; }
+    .card{ background:var(--card); border-radius:8px; padding:15px; box-shadow:0 2px 5px rgba(0,0,0,0.1); margin-bottom:20px; }
+    .item{ display:flex; gap:10px; padding:12px; border-bottom:1px solid #eee; align-items: flex-start; }
+    .item.task input[type="checkbox"]{ width:22px; height:22px; flex-shrink:0; cursor:pointer; }
+    .item.heading{ background:var(--heading-bg); color:var(--heading-color); font-weight:700; border-left:5px solid var(--heading-color); }
+    .item.note{ background:var(--note-bg); font-style:italic; border-left:5px solid #FFC107; }
+    .done label{ text-decoration: line-through; opacity: 0.5; color: var(--rock-red); }
+    .minus-state label{ color: var(--minus-red); text-decoration: underline; font-weight: bold; }
+    button{ background:var(--rock-red); color:#fff; border:none; padding:10px 20px; border-radius:6px; cursor:pointer; font-weight:700; }
+    button.ghost{ background:none; border:1px solid var(--rock-red); color:var(--rock-red); }
+    #btnMinusMode.active { background: var(--minus-red); color: white; }
+    textarea{ width:100%; min-height:80px; margin-top:10px; border-radius:6px; border:1px solid #ccc; padding:10px; box-sizing: border-box; }
+    .helper{ color:var(--minus-red); font-size:13px; margin-top:5px; }
   </style>
 </head>
 <body>
-  <header id="mainHeader">
-    <div style="display:flex;justify-content:space-between;align-items:center">
-      <h1>Checklister</h1>
-      <div style="font-weight:700;font-size:18px;line-height:1;">ROCKWOOL</div>
-    </div>
-  </header>
 
-  <div id="progressWrapper" aria-hidden="true">
-    <div class="progress-row">
-      <div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
-        <div id="progressFill" class="progress-fill"></div>
-      </div>
-      <div id="progressText" class="progress-text">0% · 0/0</div>
-    </div>
-    <div id="progressHint" style="display:none">Du mangler 0 opgaver</div>
-
-    <div id="minusToggleBar">
-      <button id="btnMinusMode" type="button">Minus til næste opgave</button>
-      <span id="minusHintText">Aktiver for at markere én opgave som minus (kræver kommentar).</span>
-    </div>
+<header id="mainHeader">
+  <div style="display:flex;justify-content:space-between;align-items:center">
+    <h1>Checklister</h1>
+    <div style="font-weight:700;">ROCKWOOL</div>
   </div>
+</header>
 
-  <main>
-    <section id="page-home" class="card">
-      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
-        <div>
-          <div style="font-weight:800">Checklister</div>
-          <div class="small">Vælg liste, udfyld arbejdsnummer. Dato låses til i dag.</div>
-        </div>
-        <div style="display:flex;gap:8px;align-items:center">
-          <!-- Indstillinger-knap, kan evt. kobles på modal -->
-          <button id="btnOpenSettings" class="ghost" title="Indstillinger">⚙️</button>
-        </div>
+<div id="progressWrapper">
+  <div class="progress-track"><div id="progressFill" class="progress-fill"></div></div>
+  <div id="progressText" style="font-size:12px; font-weight:700;">0% · 0/0</div>
+  <div id="minusToggleBar" style="display:flex; align-items:center; gap:10px; margin-top:5px;">
+    <button id="btnMinusMode" type="button" class="ghost">Minus til næste opgave</button>
+    <span style="font-size:11px; color:var(--muted)">Aktivér for at markere én fejl/minus</span>
+  </div>
+</div>
+
+<main>
+  <section id="page-home" class="card">
+    <div style="font-weight:800; margin-bottom:15px;">Vælg liste og indtast arbejdsnummer</div>
+    <label>Vælg liste</label>
+    <select id="homeChecklistSelect"></select>
+    
+    <div style="margin-top:15px;">
+      <label>Arbejdsnummer (5 cifre)</label>
+      <input id="homeWorkNr" type="text" maxlength="5" placeholder="fx 01234" style="width:100%; padding:10px; margin-top:5px;">
+      <div id="workHelp" class="helper" style="display:none">Skal være 5 cifre.</div>
+    </div>
+
+    <div style="margin-top:15px;">
+      <label>Dato</label>
+      <input id="homeDate" type="date" readonly style="width:100%; padding:10px; background:#eee;">
+    </div>
+    
+    <button id="btnStart" style="width:100%; margin-top:20px;">Start Checklist</button>
+  </section>
+
+  <section id="page-checklist" class="card" style="display:none">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+      <div>
+        <div id="chkTitle" style="font-weight:800; font-size:18px;"></div>
+        <div id="chkMeta" style="font-size:12px; color:var(--muted)"></div>
       </div>
+      <button id="btnBack" class="ghost">Tilbage</button>
+    </div>
 
-      <div style="margin-top:12px" class="row">
-        <div class="col">
-          <label>Vælg liste</label>
-          <select id="homeChecklistSelect"></select>
-        </div>
-        <div style="width:180px">
-          <label>Dato</label>
-          <input id="homeDate" type="date" readonly/>
-        </div>
-      </div>
+    <div id="itemsContainer" style="margin-top:20px;"></div>
 
-      <div style="margin-top:12px" class="row">
-        <div class="col">
-          <label>Arbejdsnummer (5 cifre)</label>
-          <input id="homeWorkNr" type="text" maxlength="5" placeholder="fx 01234"/>
-          <div id="workHelp" class="helper" style="display:none">Arbejdsnummer skal være præcis 5 cifre (0‑9).</div>
-          <div id="workRequired" class="helper" style="display:none">Arbejdsnummer skal udfyldes.</div>
-        </div>
-        <div class="col" style="display:flex;align-items:flex-end">
-          <button id="btnStart">Start</button>
-        </div>
-      </div>
-    </section>
+    <details id="completedSection" style="margin-top:20px; border-top:1px dashed #ccc;">
+      <summary id="completedSummary" style="padding:10px; cursor:pointer; font-weight:700;">Udførte opgaver (0)</summary>
+      <div id="completedContainer"></div>
+    </details>
 
-    <section id="page-checklist" class="card" style="display:none">
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <div>
-          <div id="chkTitle" style="font-weight:800"></div>
-          <div id="chkMeta" class="small"></div>
-        </div>
-        <div><button id="btnBack" class="ghost">Tilbage</button></div>
-      </div>
+    <div style="margin-top:20px;">
+      <label>Generel kommentar (valgfri)</label>
+      <textarea id="comment"></textarea>
+    </div>
 
-      <div id="itemsContainer" class="list-items"></div>
+    <div style="margin-top:15px; display:flex; gap:10px;">
+      <button id="btnClearAll" class="ghost">Nulstil</button>
+      <button id="btnSend" style="flex-grow:1; display:none;">Send Rapport</button>
+    </div>
+  </section>
+</main>
 
-      <details id="completedSection" style="display:none">
-        <summary id="completedSummary" title="Se udførte opgaver">Udførte opgaver (0)</summary>
-        <div id="completedContainer" class="list-items"></div>
-      </details>
-
-      <div style="margin-top:12px">
-        <label>Kommentar (valgfri)</label>
-        <textarea id="comment"></textarea>
-      </div>
-
-      <div style="margin-top:12px;display:flex;justify-content:space-between;align-items:center;gap:8px">
-        <button id="btnClearAll" class="ghost btn-small">Fjern markeringer</button>
-        <button id="btnSend" style="display:none;flex-grow:1;">Send</button>
-      </div>
-
-      <div class="small" style="margin-top:8px">
-        Tryk Send når alle punkter er afkrydset eller markeret minus.
-      </div>
-    </section>
-  </main>
-
-  <footer class="small">Enkel offline HTML‑app</footer>
-
-  <script>
-    const STORAGE_KEYS = {
-      recipient1: 'rg_rec1',
-      recipient2: 'rg_rec2',
-      theme:      'checklister_theme'
-    };
-
-    const headerEl=document.getElementById('mainHeader');
-    const progressWrapper=document.getElementById('progressWrapper');
-    const progressFill=document.getElementById('progressFill');
-    const progressText=document.getElementById('progressText');
-    const progressHint=document.getElementById('progressHint');
-    const progressTrack=document.querySelector('.progress-track');
-    const minusToggleBar=document.getElementById('minusToggleBar');
-    const btnMinusMode=document.getElementById('btnMinusMode');
-    const minusHintText=document.getElementById('minusHintText');
-
-    const pageHome=document.getElementById('page-home');
-    const pageChecklist=document.getElementById('page-checklist');
-    const homeChecklistSelect=document.getElementById('homeChecklistSelect');
-    const homeWorkNr=document.getElementById('homeWorkNr');
-    const homeDate=document.getElementById('homeDate');
-    const btnStart=document.getElementById('btnStart');
-    const btnBack=document.getElementById('btnBack');
-    const chkTitle=document.getElementById('chkTitle');
-    const chkMeta=document.getElementById('chkMeta');
-    const itemsContainer=document.getElementById('itemsContainer');
-    const completedContainer=document.getElementById('completedContainer');
-    const completedSection=document.getElementById('completedSection');
-    const completedSummary=document.getElementById('completedSummary');
-    const comment=document.getElementById('comment');
-    const workHelp=document.getElementById('workHelp');
-    const workRequired=document.getElementById('workRequired');
-    const btnSend=document.getElementById('btnSend');
-    const btnClearAll=document.getElementById('btnClearAll');
-
-    const headingWhitelist = [
-      "Smeltestart",
-      "Før opstart runderes anlægget  :"
-    ];
-
+<script>
     const checklists = {
-      "Aquila opstart - Spinder passer": [
-        "Drej nøgle til Energen anlægget ved kontrolrum 6 til Manuel (skal altid være manuel under drift).",
-        "Gennemgå alarmlisten.",
-        "Start kølevandssystemet i Group mode (Cooling billede 2201) (For at kunne dette, skal alle reguleringer være i auto).",
-        "Grøn lys i Kølesystem klar kommer først, når opstart sekvensen kører.",
-        "Åben gas og ilt haner i Aquila kølerummet til oxyfuel brænderne og ved gas rampen uden for kontrolrummet til BU 21-23.",
-        "Opstart anlæg: Vælg Group mode på alle sektioner på 2100 (Smeltebillede).",
-        "Vælg Start af alle sektioner undtagen uld affald i 2100.",
-        "Kontroller at alle blæsere og ventiler står i Auto i 2100.",
-        "Kontroller at opstartssekvensen ’Step 0’ er grøn i billede 2109. Hvis ikke vælg 0 i nederste bjælke.",
-        "Kontroller at sætpunktet for opvarmning før skorsten er sat til 130c på billede 2106.",
-        "Når ’Drift tilstand’ & ’Kølesystem klar’ er grøn i Cooling 2201 er anlægget klar til opstart.",
-        "Nulstil spædevandstællere på kølevandsoversigt 2201.",
-        "Kontroller alle flow på kølevandsbilledet 2201: Venturi 60 m3/h, Top 15 m3/h, Ring 45 m3/h, Konus 70 m3/h, Bund 100 m3/h, Centralrør 60 m3/h.",
-        "Sekvens billede 2109: Vælg 'opvarmning' - Opvarmningen starter herefter automatisk.",
-        "Kontroller Oxyfuel status billede 3001: Mode skal være <Brænder>, Brændere status <Off>, Mainsystem <shut off>.",
-        "Billede 2104: Filter - Sæt alle sektioner i Group mode og start dem.",
-        "Tjek alle startbetingelser er ok på sekvens billede 2109 step 5: N-gas brænder, er Lufo ok. Reset evt. Lufo på panelet i penthouse.",
-        "I step 30 skal der udluftes cykloner: Smeltecyklon og røggas purging kan ses på Billede 2901 Aquila on gas (Oversigt).",
-        "Billede 133: Sikre signal Digital ind og output. Tjek linesaftey sikre signaler.",
-        "Tjek røggas køler, er trykket ok? Ca. 6,5 bar ved kold køler og 8,5-9 bar ved varm. Efterfyld hvis nødvendigt.",
-        "Reset lav tryk pressostat og linesaftey for at frigive brændere.",
-        "Alle sektioner på AQ Chargering billede 2001: Vælg group mode.",
-        "Alle sektioner på AQ chargering billede 2001: Vælg start.",
-        "AQ Chargering billede 2001: Weighing: Tryk start. Ved problemer med rørbåndet: Reset linesafty.",
-        "Det er vigtigt at få fylde sten i sten kassen, da der bliver suget en del falsk luft gennem. Ved problemer med rørbåndet reset linesafty. Der kan være arbejdet på mixer eller rørbånd under rensestoppet.",
-        "Kontroller at fines transport er startet, og valgt til bigbag eller silo og at spjæld står korrekt.",
-        "ACON billede: 00500 - Start tromle sektion 1. Start uldløfter. Start tromleblæser. Start forspaltevalse.",
-        "Start gruppen Cooling Water på Billede 2207: Køletårn (det starter bakkekølings køletårnet).",
-        "Tjek kammer/rensedøre på filterkanal og kammer. Start kammersugerne.",
-        "Start indvendig tromlerens for tjek af dyser efter skifte. Lad tromlerens køre frem til opstart.",
-        "Afprøv at omløb kan køre ud og ind. Afprøv at snabelbakke kan bevæges i alle 4 retninger.",
-        "Start spinder. Start luftringsblæser. Kontroller drift af spinder.",
-        "Tjek flow til spinder køling på billede 1500: Spinder. Pumpen starter med spinderen.",
-        "Ved oppumpning af bindemiddel fra blandetanken til buffertank 1274, skal det første væske der kommer op, lukkes ud af bundventilen i buffertanken.",
-        "Der står så meget vand i rørstrengen, at de første produkter risikerer at blive kasseret på lavt glødetab, hvis det ikke lukkes ud.",
-        "Tjek at affaldsanlæg er klar og uden alarmer på billede 101, 102 og 103 (Linesafety area 1, 2 og 3).",
-        "Tjek at Stor stangmølle er klar / i drift og affald kører til rørbånd.",
-        "Vælg start på Filter fines dosering og Alu dosering sekvens billede 2136 NH3 (Ammoniak). Tjek grøn prik i transport luft! Ingen grøn prik = ingen flow train. Luk evt. afspærringsventilen for at komme i gang.",
-        "Når temp TT4 når 70 C tændes Oxyfuelbrænder - Bu 3,1 og 3,2 i 30 sek billede 3001.",
-        "Step 45: Når opvarmningen er fuldført og der er 130c ved skorstenen er anlægget klar til drift og spjæld til skorstenen åbner.",
-        "Step 71 Start Bu 23 på 500 Kw. Indvælg Bu23 på billede 2900. Tryk reset brænder og start på melt- heating på billede 2900: Aquila on gas Oversigt",
-        "Step 72 Start Bu 3,3 og Bu 3,4 på AQ Oxyfuel billede 3001 på 300Kw",
-        "Step 90 Start Bu 21 + Bu22 på 500 Kw. Indvælg Bu21 og Bu22 på billede 2900. Tryk reset brænder og start på melt- heating på billede Aquila on gas billede 2900",
-        "Step 100 Klar til produktion",
-        "Indvælg produktion på billede 2106 Generel oversigt",
-        "Smeltestart",
-        "Start DrySoTec anlæget på billede 2135.",
-        "Tjek der er natriumbikarbonat i doseringsbeholderen",
-        "Indvælg Raw material 6 t/h",
-        "Tryk Aktuelt Setpunkt",
-        "Indvælg Bu 3.1- 3.4 900 Kw",
-        "Indvælg Bu 21 +22 1500 Kw",
-        "Indvælg Bu 23 på 1800 Kw tryk aktuelt setpunkt på billede 2900",
-        "Waste MP1 og MP2 startes på 1 t/h hver.",
-        "Ved 850c på TT 9+10 bliver Bu 3.3 frigivet",
-        "Ved 850C på TT9 +10 frigives Returuld direkte til smeltecyklonen.",
-        "Indvælg Returuld med 0,6 ton/h",
-        "Billede 600 Bindemiddel dosering.",
-        "Lav en fyldning af spinderen",
-        "Tag manuel måling af smeltetemperaturen, når smelten løber i udløbet.",
-        "Juster energien (KW) ned i forhold til smelte temperaturen"
-      ],
-      "Opstartsliste Kældermand Aquila L5":[
-        "Før opstart runderes anlægget  :",
-        "Inspicer Smeltecyklon + Cyklon 1 + Cyklon 2 for rensefolk og smede før noget startes.",
-        "Luk lågen på cykloner 1 og 2",
-        "Luk taphul med ler-prop og kontroller at sifonen er åben.",
-        "Kontroller at:",
-        "Tappelanser er klargjort.",
-        "Køling af sifon og bakker er åbnet.",
-        "Ventiler for luft og Ammoniak til ammoniak-lanse er åbne.",
-        "Låge til stensilo og cyklon 1+2 er lukket.",
-        "Leslaw hul er rengjort.",
-        "Skift dyser til indvendig tromlerens.",
-        "Skift kammerkølingsdyser.",
-        "Spinder: se eSOP.",
-        "Monter blæserør på spinderen.",
-        "Kør spinder i position og lås den i gulv.",
-        "Monter stikkene på spinderen.",
-        "Monter multi stik på spinderen.",
-        "Drej ventil SK2 Kølekappe ved klaver åbnes",
-        "Kontroller at tromleblæser-lanser er rene og kørt på plads.",
-        "Start procesvandspumpe (pumperum). Rens filteret",
-        "Kontroller luft til bobbelrør på Bindemiddel buffer tank er åbnet,",
-        "Tjek haner under bindemiddel-buffertanken er åbne, efter skylning ved nedfyring.",
-        "Tjek at slange fra skyl samt hane er lukket.",
-        "Tjek at dræn haner på bindemiddel streng er lukket.",
-        "Dræn BM filterbeholder i BM rum + skift filtre. (Se evt. eSOP)",
-        "Åben bundhanen på BM filter,",
-        "Start pumpen ved buffer tanken i service og",
-        "kør indtil der kommer friskt grøn bindemiddel frem ved filtret.",
-        "Luk Bundhanen på filtret og",
-        "luk også den lille udluftningsventil i toppen af filtret.",
-        "Bevæg halv varmt klapspjæld og kontroller at det kører frit.",
-        "Tjek fluidicerings-luften til halv varmt klapspjæld i penthouse og lufthamre er åbent til luft på splashbox.",
-        "Kontroller kammer/rensedøre på filterkanal og kammer er lukket korrekt.",
-        "Åben for luft til varm splashbox, ved Alu doseringsbeholder, for at undgå ophobning.",
-        "Smelte hjælpes ud af udløb",
-        "Efter produktion start : Runder alle etager i ovnbygningen igen.",
-        "Tjek klap spjældet arbejder rigtigt."
-      ],
-      "Kældermand rundgang":[
-        "Tromlerens:",
-        "Kontroller at dyserne sprøjter korrekt, og at der ikke er uld ved udvendige dyser.",
-        "Kontroller at reverseringen hen over tromlen kører korrekt.",
-        "Kontroller spyddene til tromleafblæsere, fjern opbygninger.",
-        "Er der flow nok på afblæserne, træk spyddene ud og kontroller dem.",
-        "Fjern opbygninger omkring forspaltevalse, samt på skråplade.",
-        "Kontroller at tromlerens pumper kører korrekt",
-
-        "Tør – og Vådkælder",
-        "Kontroller vandsneglen og drænristen er fri for opbygning.",
-        "Kontroller at der ikke ligger åbne vandslanger, og at der ikke er vandspild nogen steder.",
-        "Kontroller at niveauet i kælderbrønde er normalt, og at pumperne kører normalt.",
-        "I tørkælderen kontrolleres området ved cellesluser for recycling for utætheder.",
-        "Lyt efter større vibrationer end normalt, tjek for røg i hele kælderen.",
-
-        "Pumperum",
-        "Kontroller at filtre i dagtanken ikke er stoppede, og at vi ikke bruger rå-vand i stedet for procesvand.",
-        "Kontroller om pumperne kører korrekt, og der ikke er utætheder.",
-
-        "Chargeringsbygning",
-        "Tjek at skippen er fri for opbygning.",
-        "Tjek at skipgraven ikke er overfyldt med stenmateriale.",
-        "Ved frost, tjek om der er tændt for varmen.",
-        "Kontroller der ikke er opbygning i båndomkastene.",
-        "Rens siderne på vejebåndet for opbygning.",
-        "Kontroller at der er NaBi i bigbaggen ved NaBi-doseringsanlægget, og monter en ny sæk hvis den er tom.",
-
-        "Bindemiddel bygning.",
-        "Bag blandetank: Kontroller at ventil til skyl er lukket, og at slangen er afmonteret.",
-        "Kontroller at filtre til bindemiddel er skiftet.",
-
-        "Affaldsanlæg",
-        "Kontroller at der ikke er bygget “bro” op i den tørre kasseføder, så tilgang til snegl er blokeret.",
-        "Kontroller at følerne i kasseføderne sidder korrekt.",
-        "Kontroller at transporten af affald køres igennem stangmøllen, medmindre der arbejdes med affald fra kammersugerfiltre eller berokammeraffald.",
-        "Lyt efter uregelmæssigheder og kig efter større spild end normalt fra snegle.",
-
-        "Hjælpematerialer på spinderdæk.",
-        "Tjek hvor mange tapstænger vi har. Husk at bestille ved behov.",
-        "Tjek hvor mange temperaturmåler (håndgranater) vi har. Husk at bestille ved behov.",
-
-        "Buffertank og BM rum",
-        "Kontroller at luft til boblerør er åben.",
-        "Kontroller at filter til bindemiddel er skiftet og udluftet.",
-
-        "Filterdæk-Fordelerdæk-Blæserdæk",
-        "På alle dæk tjekkes for røg, støj og støv i større omfang end normalt.",
-        "Tjek at alle bånd kører korrekt, så vidt muligt centreret på valserne.",
-        "Kig grundigt efter evt. utætheder fra kølevandsforbindelser og pumper.",
-        "På blæserdækket tjekkes især efter for større vibrationsniveau end normalt.",
-        "Tjek Quench-bakken for opbygning.",
-        "Kontroller om der er opbygning i Leslau-hullet og rens hvis nødvendigt."
-      ]
+        "Aquila opstart - Spinder passer": [
+            "Drej nøgle til Energen anlægget ved manuel", "Gennemgå alarmlisten.", "Start kølevandssystemet i Group mode", 
+            "Åben gas og ilt haner i Aquila kølerummet", "Opstart anlæg: Vælg Group mode", "Smeltestart:", "Start DrySoTec anlæget på billede 2135."
+        ],
+        "Opstartsliste Kældermand Aquila L5": [
+            "Før opstart runderes anlægget :", "Inspicer Smeltecyklon + Cyklon 1 + Cyklon 2", "Luk lågen på cykloner 1 og 2", "Tappelanser er klargjort.", "Køling af sifon og bakker er åbnet."
+        ],
+        "Kældermand rundgang": [
+            "Tromlerens:", "Kontroller at dyserne sprøjter korrekt", "Fjern opbygninger omkring forspaltevalse", "Pumperum:", "Kontroller at filtre i dagtanken ikke er stoppede"
+        ]
     };
 
-    let currentChecklistName=null;
-    let taskStateMap = {};
-    let minusModeActive = false;
+    const state = { minusMode: false, currentTasks: [] };
 
-    function show(el, display='block'){ if(!el) return; el.style.display=display; }
-    function hide(el){ if(!el) return; el.style.display='none'; }
+    // Initialisering
+    document.getElementById('homeDate').valueAsDate = new Date();
+    const sel = document.getElementById('homeChecklistSelect');
+    Object.keys(checklists).forEach(key => {
+        const opt = document.createElement('option');
+        opt.value = key; opt.textContent = key;
+        sel.appendChild(opt);
+    });
 
-    function adjustProgressTop(){
-      progressWrapper.style.top=(headerEl.offsetHeight)+'px';
-    }
-    window.addEventListener('resize',adjustProgressTop);
-
-    function isHeading(text){
-      const t=text.trim();
-      if(!t) return false;
-      if(headingWhitelist.includes(t)) return true;
-      return t.endsWith(':') || (t.length < 25 && !t.endsWith('.'));
-    }
-
-    function isNote(text){
-      const t=text.trim();
-      const patterns=[
-        /^\d{1,2}\/\d{1,2}/,
-        /dato/i, /navn/i, /mester/i, /lagam/i, /side \d+\/\d+/i,
-        /eSOP/
-      ];
-      return patterns.some(p=>p.test(t));
-    }
-
-    function isTask(text){
-      return !isHeading(text) && !isNote(text);
-    }
-
-    function initTaskState(idx){
-      if(!taskStateMap[idx]){
-        taskStateMap[idx]={checked:false,minus:false,comment:''};
-      }
-      return taskStateMap[idx];
-    }
-
-    function setTaskChecked(idx,val){
-      const s=initTaskState(idx);
-      s.checked=!!val;
-      if(val) s.minus=false;
-    }
-
-    function setTaskMinus(idx,val){
-      const s=initTaskState(idx);
-      s.minus=!!val;
-      if(val) s.checked=false;
-    }
-
-    function applyMinusVisual(div){
-      const label=div.querySelector('label');
-      if(!label) return;
-      const text=label.textContent.trim().replace(/^[-–]\s*/,'');
-      label.textContent=`- ${text}`;
-    }
-    function removeMinusVisual(div){
-      const label=div.querySelector('label');
-      if(!label) return;
-      label.textContent=label.textContent.replace(/^[-–]\s*/,'');
-    }
-    function applyMinusCheckbox(cb){
-      cb.classList.add('minus-checked');
-    }
-    function removeMinusCheckbox(cb){
-      cb.classList.remove('minus-checked');
-    }
-
-    function getTaskCountsFromDom(){
-      const allTasks=document.querySelectorAll('.item.task');
-      const totalTasks=allTasks.length;
-      let done=0;
-      allTasks.forEach(task=>{
-        const cb=task.querySelector('input[type="checkbox"]');
-        const isMinus=task.classList.contains('minus-state');
-        const isChecked=cb && cb.checked;
-        if(isMinus || isChecked) done++;
-      });
-      return { totalTasks, checkedTasks: done };
-    }
-
-    function updateCompletedSummary(){
-      const doneCount=completedContainer.querySelectorAll('.item.task').length;
-      if(doneCount===0) hide(completedSection);
-      else show(completedSection);
-      completedSummary.textContent=`Udførte opgaver (${doneCount})`;
-    }
-
-    function updateProgressBar(){
-      if(pageChecklist.style.display==='none' || !currentChecklistName){
-        hide(progressWrapper);
-        return;
-      }
-      const { totalTasks, checkedTasks }=getTaskCountsFromDom();
-      if(!totalTasks){
-        hide(progressWrapper);
-        progressText.textContent='0% · 0/0';
-        progressFill.style.width='0%';
-        hide(progressHint);
-        if(progressTrack) progressTrack.setAttribute('aria-valuenow','0');
-        return;
-      }
-      const pct=Math.round((checkedTasks/totalTasks)*100);
-      const remaining=totalTasks-checkedTasks;
-
-      progressFill.style.width=pct+'%';
-      progressText.textContent=`${pct}% · ${checkedTasks}/${totalTasks}`;
-      if(remaining>0){
-        progressHint.textContent=`Du mangler ${remaining} opgave${remaining===1?'':'r'}`;
-      }else{
-        progressHint.textContent='Alle opgaver er udført eller markeret minus – klar til at sende';
-      }
-      show(progressHint);
-      if(progressTrack) progressTrack.setAttribute('aria-valuenow',String(pct));
-      show(progressWrapper,'flex');
-      show(minusToggleBar,'flex');
-      checkAllAndShowSend();
-    }
-
-    function checkAllAndShowSend(){
-      if(pageChecklist.style.display==='none') return;
-      const { totalTasks, checkedTasks }=getTaskCountsFromDom();
-      btnSend.style.display=(checkedTasks===totalTasks && totalTasks>0)?'block':'none';
-    }
-
-    function attachCheckboxLogic(cb,div){
-      cb.addEventListener('change',e=>{
-        const idx=parseInt(div.dataset.taskIndex,10);
-        const state=initTaskState(idx);
-
-        if(minusModeActive){
-          minusModeActive=false;
-          btnMinusMode.classList.remove('active');
-          minusHintText.textContent='Aktiver for at markere én opgave som minus (kræver kommentar).';
-
-          cb.checked=false;
-          removeMinusCheckbox(cb);
-
-          const existingComment=state.comment||'';
-          const commentText=prompt('Angiv kommentar til minus (påkrævet):',existingComment);
-          if(!commentText || commentText.trim()===''){
-            alert('Kommentar er påkrævet for minus. Opgaven markeres ikke som minus.');
-            setTaskMinus(idx,false);
-            div.classList.remove('minus-state');
-            removeMinusVisual(div);
-            removeMinusCheckbox(cb);
-            updateProgressBar();
+    document.getElementById('btnStart').onclick = () => {
+        const nr = document.getElementById('homeWorkNr').value;
+        if(nr.length !== 5) {
+            document.getElementById('workHelp').style.display = 'block';
             return;
-          }
-
-          state.comment=commentText.trim();
-          setTaskMinus(idx,true);
-          setTaskChecked(idx,false);
-
-          div.classList.add('minus-state');
-          div.classList.remove('done');
-          applyMinusVisual(div);
-          applyMinusCheckbox(cb);
-
-          if(div.parentElement===completedContainer){
-            insertInOrder(div,itemsContainer,parseInt(div.dataset.originalIndex,10));
-            updateCompletedSummary();
-          }
-
-          updateProgressBar();
-          return;
         }
+        document.getElementById('page-home').style.display = 'none';
+        document.getElementById('page-checklist').style.display = 'block';
+        document.getElementById('progressWrapper').style.display = 'flex';
+        render(sel.value);
+    };
 
-        const checked=!!e.target.checked;
-        setTaskChecked(idx,checked);
+    document.getElementById('btnBack').onclick = () => location.reload();
 
-        if(checked){
-          div.classList.remove('minus-state');
-          removeMinusVisual(div);
-          removeMinusCheckbox(cb);
-        }
+    document.getElementById('btnMinusMode').onclick = function() {
+        state.minusMode = !state.minusMode;
+        this.classList.toggle('active', state.minusMode);
+    };
 
-        if(checked){
-          div.classList.add('done');
-          setTimeout(()=>{
-            completedContainer.appendChild(div);
-            updateCompletedSummary();
-          },250);
-        }else{
-          div.classList.remove('done');
-          insertInOrder(div,itemsContainer,parseInt(div.dataset.originalIndex,10));
-          updateCompletedSummary();
-        }
-        updateProgressBar();
-      });
-    }
+    function render(name) {
+        const container = document.getElementById('itemsContainer');
+        const meta = document.getElementById('chkMeta');
+        document.getElementById('chkTitle').textContent = name;
+        meta.textContent = `Arbejdsnr: ${document.getElementById('homeWorkNr').value} | Dato: ${document.getElementById('homeDate').value}`;
+        
+        container.innerHTML = '';
+        checklists[name].forEach((text, index) => {
+            const div = document.createElement('div');
+            div.className = 'item';
+            div.dataset.index = index;
 
-    function renderChecklist(name){
-      currentChecklistName=name;
-      taskStateMap={};
-      chkTitle.textContent=name;
-      chkMeta.textContent=`Arbejdsnummer: ${homeWorkNr.value||''} · Dato: ${homeDate.value||''}`;
-      itemsContainer.innerHTML='';
-      completedContainer.innerHTML='';
-      hide(completedSection);
-      completedSummary.textContent='Udførte opgaver (0)';
-      hide(btnSend);
-
-      const items=checklists[name]||[];
-      let taskIndex=0;
-
-      items.forEach((t,i)=>{
-        const text=t.trim();
-        const div=document.createElement('div');
-        let displayText=text;
-        div.dataset.originalIndex=i;
-
-        if(isNote(text)){
-          div.className='item note';
-          const lbl=document.createElement('label');
-          lbl.textContent=displayText;
-          div.appendChild(lbl);
-          itemsContainer.appendChild(div);
-          return;
-        }
-        if(isHeading(text)){
-          div.className='item heading';
-          if(displayText.endsWith('.')) displayText=displayText.slice(0,-1);
-          const lbl=document.createElement('label');
-          lbl.textContent=displayText;
-          div.appendChild(lbl);
-          itemsContainer.appendChild(div);
-          return;
-        }
-
-        div.className='item task';
-        div.dataset.taskIndex=taskIndex++;
-        initTaskState(taskIndex-1);
-
-        const cb=document.createElement('input');
-        cb.type='checkbox';
-        cb.id='cb_'+div.dataset.taskIndex;
-
-        const lbl=document.createElement('label');
-        lbl.htmlFor=cb.id;
-        lbl.textContent=displayText;
-
-        div.appendChild(cb);
-        div.appendChild(lbl);
-        attachCheckboxLogic(cb,div);
-        itemsContainer.appendChild(div);
-      });
-
-      updateCompletedSummary();
-      updateProgressBar();
-      adjustProgressTop();
-    }
-
-    function insertInOrder(element,container,originalIndex){
-      const items=Array.from(container.children).filter(el=>typeof el.dataset.originalIndex!=='undefined');
-      let next=null;
-      for(const item of items){
-        const idx=parseInt(item.dataset.originalIndex,10);
-        if(idx>originalIndex){ next=item; break; }
-      }
-      if(next) container.insertBefore(element,next);
-      else container.appendChild(element);
-    }
-
-    btnClearAll.addEventListener('click',()=>{
-      if(!currentChecklistName) return;
-      if(!confirm('Er du sikker på, at du vil fjerne alle markeringer?'))return;
-      const allTaskCheckboxes=document.querySelectorAll('.item.task input[type="checkbox"]');
-      allTaskCheckboxes.forEach(cb=>{
-        if(cb.checked){
-          cb.checked=false;
-          cb.dispatchEvent(new Event('change'));
-        }
-      });
-      Object.keys(taskStateMap).forEach(k=>{ taskStateMap[k].minus=false; });
-      document.querySelectorAll('.item.task').forEach(div=>{
-        div.classList.remove('minus-state');
-        removeMinusVisual(div);
-        const cb=div.querySelector('input[type="checkbox"]');
-        if(cb) removeMinusCheckbox(cb);
-      });
-      updateProgressBar();
-    });
-
-    function buildAndSend(){
-      const name=currentChecklistName;
-      const items=checklists[name]||[];
-      const when=new Date().toLocaleString();
-
-      let subject=`[CHECKLISTE] ${name} - ${homeWorkNr.value||'[ukendt]'} - ${when}`;
-      let body=`Arbejdsnummer: ${homeWorkNr.value||''}\nTidspunkt: ${when}\nChecklistetype: ${name}\n\nPunkter:\n`;
-
-      let taskIndex=0;
-      for(let i=0;i<items.length;i++){
-        const itemText=items[i];
-        if(isTask(itemText)){
-          const state=taskStateMap[taskIndex] || {checked:false,minus:false,comment:''};
-          let mark='[ ]';
-          if(state.minus) mark='[-]';
-          else if(state.checked) mark='[x]';
-          body+=`${mark} ${itemText}\n`;
-          if(state.minus && state.comment){
-            body+=`    Kommentar: ${state.comment}\n`;
-          }
-          taskIndex++;
-        }else if(isHeading(itemText)){
-          body+=`\n*** ${itemText.replace(/\.$/,'').toUpperCase()} ***\n`;
-        }else if(isNote(itemText)){
-          body+=`(${itemText})\n`;
-        }
-      }
-
-      body+=`\nKommentar (generel):\n${comment.value||''}\n\nDato: ${homeDate.value||''}\n`;
-      const r1=localStorage.getItem(STORAGE_KEYS.recipient1)||'';
-      const r2=localStorage.getItem(STORAGE_KEYS.recipient2)||'';
-      const recs=[r1,r2].filter(x=>x&&x.trim());
-      if(recs.length===0){
-        if(!confirm('Ingen modtagere angivet. Fortsæt uden modtagere?'))return;
-      }
-      window.location.href=`mailto:${recs.join(',')}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-      alert('Checkliste er overført til din mailklient – husk at trykke Send.');
-    }
-    btnSend.addEventListener('click',buildAndSend);
-
-    homeWorkNr.addEventListener('keydown',e=>{
-      if(e.key==='Enter'){
-        e.preventDefault();
-        btnStart.click();
-      }
-    });
-
-    btnMinusMode.addEventListener('click',()=>{
-      minusModeActive=!minusModeActive;
-      if(minusModeActive){
-        btnMinusMode.classList.add('active');
-        minusHintText.textContent='Minus er aktiv: klik på én opgave for at markere minus (kræver kommentar).';
-      }else{
-        btnMinusMode.classList.remove('active');
-        minusHintText.textContent='Aktiver for at markere én opgave som minus (kræver kommentar).';
-      }
-    });
-
-    btnStart.addEventListener('click',()=>{
-      hide(workHelp);hide(workRequired);
-      if(!homeWorkNr.value||homeWorkNr.value.trim()===''){
-        show(workRequired);return;
-      }
-      if(!/^\d{5}$/.test(homeWorkNr.value||'')){
-        show(workHelp);return;
-      }
-      renderChecklist(homeChecklistSelect.value);
-      hide(pageHome);
-      show(pageChecklist);
-      adjustProgressTop();
-      updateProgressBar();
-      window.scrollTo(0,0);
-    });
-
-    btnBack.addEventListener('click',()=>{
-      hide(pageChecklist);
-      show(pageHome);
-      hide(progressWrapper);
-      progressFill.style.width='0%';
-      progressText.textContent='0% · 0/0';
-      hide(progressHint);
-      hide(minusToggleBar);
-      currentChecklistName=null;
-      minusModeActive=false;
-      btnMinusMode.classList.remove('active');
-      minusHintText.textContent='Aktiver for at markere én opgave som minus (kræver kommentar).';
-      if(progressTrack) progressTrack.setAttribute('aria-valuenow','0');
-      window.scrollTo(0,0);
-    });
-
-    homeWorkNr.addEventListener('input',()=>{
-      hide(workHelp);hide(workRequired);
-      homeWorkNr.value=(homeWorkNr.value||'').replace(/[^\d]/g,'').slice(0,5);
-    });
-
-    function setTodayDate(){
-      const d=new Date();
-      const y=d.getFullYear();
-      const m=String(d.getMonth()+1).padStart(2,'0');
-      const day=String(d.getDate()).padStart(2,'0');
-      homeDate.value=`${y}-${m}-${day}`;
-    }
-
-    (function init(){
-      try{
-        setTodayDate();
-        homeChecklistSelect.innerHTML='';
-        Object.keys(checklists).forEach(k=>{
-          const o=document.createElement('option');
-          o.value=k;
-          o.textContent=k;
-          homeChecklistSelect.appendChild(o);
+            if(text.endsWith(':')) {
+                div.classList.add('heading');
+                div.innerHTML = `<label>${text}</label>`;
+            } else {
+                div.classList.add('task');
+                const cb = document.createElement('input');
+                cb.type = 'checkbox';
+                const lbl = document.createElement('label');
+                lbl.textContent = text;
+                
+                cb.onchange = () => handleToggle(cb, div);
+                div.append(cb, lbl);
+            }
+            container.appendChild(div);
         });
-        adjustProgressTop();
-        hide(progressWrapper);
-        hide(workHelp);
-        hide(workRequired);
-        hide(minusToggleBar);
-      }catch(e){
-        console.error('Kritisk fejl under initialisering:',e);
-      }
-    })();
-  </script>
+        updateUI();
+    }
+
+    function handleToggle(cb, div) {
+        if(state.minusMode && cb.checked) {
+            const reason = prompt("Angiv årsag til minus-markering:");
+            if(!reason) { cb.checked = false; return; }
+            div.classList.add('minus-state');
+            div.dataset.reason = reason;
+            state.minusMode = false;
+            document.getElementById('btnMinusMode').classList.remove('active');
+        } else if (!cb.checked) {
+            div.classList.remove('minus-state', 'done');
+            delete div.dataset.reason;
+        }
+
+        if(cb.checked) {
+            div.classList.add('done');
+            setTimeout(() => {
+                document.getElementById('completedContainer').appendChild(div);
+                updateUI();
+            }, 300);
+        } else {
+            const items = document.getElementById('itemsContainer');
+            insertInOrder(div, items);
+            updateUI();
+        }
+    }
+
+    function insertInOrder(el, container) {
+        const idx = parseInt(el.dataset.index);
+        const children = Array.from(container.children);
+        const next = children.find(c => parseInt(c.dataset.index) > idx);
+        next ? container.insertBefore(el, next) : container.appendChild(el);
+    }
+
+    function updateUI() {
+        const tasks = document.querySelectorAll('.item.task');
+        const completed = document.querySelectorAll('.item.task.done').length + document.querySelectorAll('.item.task.minus-state').length;
+        const total = tasks.length;
+        const pct = total ? Math.round((completed/total)*100) : 0;
+
+        document.getElementById('progressFill').style.width = pct + '%';
+        document.getElementById('progressText').textContent = `${pct}% · ${completed}/${total}`;
+        document.getElementById('completedSummary').textContent = `Udførte opgaver (${document.getElementById('completedContainer').children.length})`;
+        document.getElementById('btnSend').style.display = (completed === total && total > 0) ? 'block' : 'none';
+        document.getElementById('completedSection').style.display = document.getElementById('completedContainer').children.length ? 'block' : 'none';
+    }
+
+    document.getElementById('btnSend').onclick = () => {
+        let report = `Checkliste: ${document.getElementById('chkTitle').textContent}\n`;
+        report += `Arbejdsnummer: ${document.getElementById('homeWorkNr').value}\n\n`;
+        
+        document.querySelectorAll('.minus-state').forEach(el => {
+            report += `[MINUS] ${el.querySelector('label').textContent}: ${el.dataset.reason}\n`;
+        });
+        
+        report += `\nGenerel kommentar: ${document.getElementById('comment').value}`;
+        
+        const mailto = `mailto:modtager@rockwool.com?subject=Checkliste Fuldført&body=${encodeURIComponent(report)}`;
+        window.location.href = mailto;
+    };
+
+    document.getElementById('btnClearAll').onclick = () => { if(confirm("Vil du rydde alle markeringer?")) location.reload(); };
+</script>
+
 </body>
 </html>
